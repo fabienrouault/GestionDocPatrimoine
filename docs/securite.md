@@ -75,3 +75,8 @@ La page affiche le message de l'API et la requête en cause (« … (400) — GE
 - **400 « … not enabled for Web API / fields »** : paramètre `Webapi/<table>/fields` absent ou ne contenant pas la colonne (mettre `*`).
 - **403 / « Entity not enabled »** : paramètre `Webapi/<table>/enabled` absent ou autorisation de table manquante pour le rôle.
 - **404** : nom d'ensemble de table incorrect (objet `SET` en tête du JS).
+- **400 « Une erreur inattendue s'est produite »** sur une requête `$select=…` : un des noms de colonne de la requête n'existe pas (ou n'est pas autorisé) sur la table.
+  Comparez chaque nom avec les **noms logiques** réels (Power Apps → table → *Colonnes* → ouvrir la colonne → *Options avancées* → « Nom logique »).
+  Test rapide dans la console du navigateur (F12), page du site connecté, sur une requête sans `$select` :
+  `fetch('/_api/craba_fsjd_modeledocuments?$top=1',{headers:{Accept:'application/json'}}).then(r=>r.text()).then(console.log)`
+  → si la table contient au moins une ligne, la réponse liste tous les noms de colonnes disponibles.

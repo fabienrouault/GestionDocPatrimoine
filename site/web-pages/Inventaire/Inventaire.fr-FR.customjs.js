@@ -192,7 +192,7 @@
   function loadRef() {
     if (ref) { return Promise.resolve(ref); }
     return Promise.all([
-      api.list(SET.modele, '$select=fsjd_modeledocumentid,fsjd_name,fsjd_niveau,fsjd_categorie,fsjd_ordre&$filter=statecode eq 0&$orderby=fsjd_ordre asc'),
+      api.list(SET.modele, '$select=fsjd_modeledocumentid,fsjd_name,fsjd_niveau,fsjd_categorie,fsjd_ordre&$orderby=fsjd_ordre asc'),
       api.list(SET.territoire, '$select=fsjd_territoireid,fsjd_name')
     ]).then(function (r) {
       var terr = {}; r[1].forEach(function (t) { terr[t.fsjd_territoireid] = t.fsjd_name; });

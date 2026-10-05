@@ -192,7 +192,7 @@
   function loadRef() {
     if (ref) { return Promise.resolve(ref); }
     return Promise.all([
-      api.list(SET.modele, '$select=craba_fsjd_modeledocumentid,craba_fsjd_name,craba_fsjd_niveau,craba_fsjd_categorie,craba_fsjd_ordre&$filter=statecode eq 0&$orderby=craba_fsjd_ordre asc'),
+      api.list(SET.modele, '$select=craba_fsjd_modeledocumentid,craba_fsjd_name,craba_fsjd_niveau,craba_fsjd_categorie,craba_fsjd_ordre&$orderby=craba_fsjd_ordre asc'),
       api.list(SET.territoire, '$select=craba_fsjd_territoireid,craba_fsjd_name')
     ]).then(function (r) {
       var terr = {}; r[1].forEach(function (t) { terr[t.craba_fsjd_territoireid] = t.craba_fsjd_name; });
