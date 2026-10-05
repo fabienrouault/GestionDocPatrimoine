@@ -1,6 +1,17 @@
 # Modèle de données Dataverse
 
-Préfixe d'éditeur : **`fsjd`**. Les noms ci-dessous sont des **noms logiques / de schéma en minuscules** : saisissez-les à
+> **Préfixe d'éditeur.** Dataverse ajoute automatiquement le préfixe de votre éditeur devant chaque nom saisi
+> (ex. `craba_` → `craba_fsjd_site`). Les sources utilisent `fsjd_` ; avant de coller le JS dans Power Pages, lancez
+> `python scripts/apply_prefix.py craba_` (remplacez `craba_` par votre préfixe) et utilisez le fichier généré dans `dist/`.
+> Si la colonne principale de vos tables ne s'appelle pas `<préfixe>fsjd_name` (ex. `craba_name`), ajoutez-la en 2ᵉ argument.
+> Un fichier prêt à l'emploi pour le préfixe `craba_` est fourni : `dist/craba/`.
+
+> **Colonnes de recherche (liens 1-N).** Créer une colonne *Recherche* sur la table enfant **crée déjà** la relation 1-N :
+> ne créez pas en plus la relation depuis le panneau *Relations* (erreur « An attribute with the specified name … already exists »).
+> Exemple : pour lier Établissement → Territoire, ajoutez la colonne `fsjd_territoire` de type Recherche dans `fsjd_site`, et c'est tout.
+> Seules les relations **plusieurs-à-plusieurs** (avec `contact`) se créent depuis *Relations → Ajouter une relation → Plusieurs-à-plusieurs*.
+
+Préfixe d'éditeur utilisé dans la suite : **`fsjd`**. Les noms ci-dessous sont des **noms logiques / de schéma en minuscules** : saisissez-les à
 l'identique à la création (le code du site les utilise tels quels, y compris pour les liaisons `@odata.bind`).
 Créez les tables dans [make.powerapps.com](https://make.powerapps.com) → *Tables* (ou demandez à Copilot / au *Plan designer* de
 Power Pages de les générer à partir de ce document).

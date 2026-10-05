@@ -21,7 +21,7 @@ un seul outil de saisie et un tableau d'avancement.
 | `tests/` | Faux serveur Power Pages + test de bout en bout (Playwright) |
 
 ## Mise en service (ordre conseillé)
-1. **Dataverse** : créer les 6 tables selon `docs/modele-donnees.md`, importer `data/modeles_documents.csv`,
+1. **Dataverse** (si votre préfixe d'éditeur n'est pas vide, voir `scripts/apply_prefix.py` ; version `craba_` fournie dans `dist/craba/`) : créer les 6 tables selon `docs/modele-donnees.md`, importer `data/modeles_documents.csv`,
    créer les territoires et les établissements puis affecter les personnes : territoriaux ↔ territoires, responsables d'établissement ↔ établissements (relations N:N, plusieurs personnes possibles par établissement).
 2. **Site Power Pages** : dans le studio de conception, créer la page **Inventaire** (URL partielle `inventaire`, modèle de page
    *Default studio template*) et coller le contenu des 3 fichiers `Inventaire.fr-FR.*` (éditeur de code → HTML / CSS / JS).
