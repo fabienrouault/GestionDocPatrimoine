@@ -68,3 +68,10 @@ Réglage conseillé : `Site/EnableCustomErrors = false` uniquement en recette, p
 ## 5. Contrôle d'accès aux pages
 Pages `Inventaire` : ajouter une **règle de contrôle d'accès de page** (*Restreindre la lecture*) limitée aux rôles
 `Responsable technique` et `Pilotage FSJD`. La page `Accueil` peut rester publique (aucune donnée) ou être restreinte aussi.
+
+## Dépannage : erreurs affichées par la page
+La page affiche le message de l'API et la requête en cause (« … (400) — GET craba_fsjd_sites?$select=… »).
+- **400 « Could not find a property named 'xxx' »** : le nom d'une colonne dans le JS ne correspond pas à votre table (typiquement la colonne principale : `craba_name` au lieu de `craba_fsjd_name` → relancer `scripts/apply_prefix.py craba_ craba_name`), ou la colonne n'existe pas encore.
+- **400 « … not enabled for Web API / fields »** : paramètre `Webapi/<table>/fields` absent ou ne contenant pas la colonne (mettre `*`).
+- **403 / « Entity not enabled »** : paramètre `Webapi/<table>/enabled` absent ou autorisation de table manquante pour le rôle.
+- **404** : nom d'ensemble de table incorrect (objet `SET` en tête du JS).

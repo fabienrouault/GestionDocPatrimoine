@@ -145,7 +145,7 @@
         if (!r.ok) {
           return r.text().then(function (t) {
             var m = t; try { m = JSON.parse(t).error.message; } catch (e) { /* texte brut */ }
-            throw new Error((m || r.statusText) + ' (' + r.status + ')');
+            throw new Error((m || r.statusText) + ' (' + r.status + ') — ' + method + ' ' + decodeURIComponent(url).replace(/^\/_api\//, ''));
           });
         }
         return r;
