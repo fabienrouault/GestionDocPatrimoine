@@ -1,0 +1,15 @@
+﻿type;famille
+Énergie;Electricité
+Énergie;Gaz
+Énergie;Fuel
+Énergie;Eau Potable
+Énergie;Téléphonie / Internet
+Maintenance;CVC
+Maintenance;Plomberie
+Maintenance;Electricité Courants Forts (CFO)
+Maintenance;Electricité Courants Faibles (Cfa)
+Maintenance;Systèmes de Sécurité Incendie (SSI)
+Maintenance;Appareils élévateurs
+Maintenance;Gestion Technique du Bâtiment (GTB)
+Maintenance;Portes et Portails
+Maintenance;Autres …

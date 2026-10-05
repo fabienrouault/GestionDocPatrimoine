@@ -1,0 +1,21 @@
+<style>
+.fsjd-hero { background: linear-gradient(135deg, #102a4a, #1d4f82); color: #fff; padding: 56px 24px; border-radius: 0 0 24px 24px; text-align: center; }
+.fsjd-hero h1 { color: #fff; font-weight: 800; margin: 0 0 12px; }
+.fsjd-hero p { max-width: 640px; margin: 0 auto 24px; opacity: .9; line-height: 1.6; }
+.fsjd-steps { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 18px; margin: 32px 0; }
+.fsjd-steps div { background: #fff; border: 1px solid #e3e8ef; border-radius: 12px; padding: 20px; box-shadow: 0 1px 3px rgba(16,42,74,.06); }
+.fsjd-steps b { display: inline-flex; width: 30px; height: 30px; border-radius: 50%; background: #102a4a; color: #fff; align-items: center; justify-content: center; margin-bottom: 10px; }
+</style>
+<div class="fsjd-hero">
+  <h1>Inventaire documentaire du patrimoine</h1>
+  <p>Outil interne de la Fondation Saint Jean de Dieu : chaque responsable technique territorial recense, établissement par établissement, les documents techniques, réglementaires et contractuels disponibles, et dépose les fichiers dans l’espace Teams partagé.</p>
+  <a class="btn btn-lg btn-warning" href="/inventaire/">{% if user %}Accéder à mon inventaire{% else %}Se connecter{% endif %}</a>
+</div>
+<div class="container">
+  <div class="fsjd-steps">
+    <div><b>1</b><h4>Complétez les fiches</h4><p>Informations générales de l’établissement et de chacun de ses bâtiments.</p></div>
+    <div><b>2</b><h4>Qualifiez chaque document</h4><p>Statut (disponible, obsolète/partiel, manquant, non applicable), date et priorité.</p></div>
+    <div><b>3</b><h4>Déposez les fichiers</h4><p>Un clic sur « Déposer » : le fichier est classé automatiquement dans le dossier Teams partagé.</p></div>
+    <div><b>4</b><h4>Suivez l’avancement</h4><p>Taux de complétude par établissement et par territoire, export CSV de la synthèse.</p></div>
+  </div>
+</div>

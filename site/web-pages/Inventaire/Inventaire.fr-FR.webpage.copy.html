@@ -1,0 +1,12 @@
+{% if user %}
+  <div id="fsjd-app" data-user-name="{{ user.fullname | escape }}" data-pilotage="{% if user.roles contains 'Pilotage FSJD' %}1{% endif %}">
+    <p class="fsjd-loading">Chargement…</p>
+  </div>
+  <noscript><p>JavaScript est nécessaire pour utiliser l’inventaire documentaire.</p></noscript>
+{% else %}
+  <div class="fsjd-empty">
+    <h2>Connexion requise</h2>
+    <p>Cet outil est réservé aux collaborateurs de la Fondation.</p>
+    <p><a class="btn btn-primary" href="/SignIn?returnUrl={{ request.path | escape }}">Se connecter avec mon compte professionnel</a></p>
+  </div>
+{% endif %}

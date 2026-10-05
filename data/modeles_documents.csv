@@ -1,0 +1,58 @@
+﻿niveau;categorie;code_categorie;libelle;ordre
+Site;Propriété et conformité administrative;ADM;Acte de propriété / Bail / contrat de location;1
+Site;Propriété et conformité administrative;ADM;Plan de bornage;2
+Site;Plans;PLN;Plan Topographique;3
+Site;Plans;PLN;Plan masse;4
+Site;Plans;PLN;Plans des réseaux publics d'adduction et de rejet / raccordements;5
+Site;Plans;PLN;Plan VRD (Voirie et Réseaux Divers);6
+Site;Diagnostics de site;DIA;Rapport géotechnique et hydrogéologique du site;7
+Site;Diagnostics de site;DIA;Diagnostic Pollution des sols;8
+Site;Diagnostics de site;DIA;Diagnostic archéologique préventif;9
+Site;Diagnostics de site;DIA;Diagnostic des réseaux enterrés existants;10
+Site;Diagnostics de site;DIA;Diagnostic HAP (Hydrocarbures Aromatiques Polycycliques) des voiries;11
+Bâtiment;Plans - Dossier des Ouvrages Exécutés;PLN;Dossier du Permis de Construire ou de Démolir;1
+Bâtiment;Plans - Dossier des Ouvrages Exécutés;PLN;Demande d'Autorisation de travaux (dernière réalisée);2
+Bâtiment;Plans - Dossier des Ouvrages Exécutés;PLN;Plans des niveaux (plan architecte ou relevé géomètre) PDF / DWG;3
+Bâtiment;Plans - Dossier des Ouvrages Exécutés;PLN;Plan des façades;4
+Bâtiment;Plans - Dossier des Ouvrages Exécutés;PLN;Coupes;5
+Bâtiment;Plans - Dossier des Ouvrages Exécutés;PLN;Synoptique – Electricité CFO;6
+Bâtiment;Plans - Dossier des Ouvrages Exécutés;PLN;Synoptique – Electricité Cfa;7
+Bâtiment;Plans - Dossier des Ouvrages Exécutés;PLN;Synoptique – SSI;8
+Bâtiment;Plans - Dossier des Ouvrages Exécutés;PLN;Synoptique – Plomberie;9
+Bâtiment;Plans - Dossier des Ouvrages Exécutés;PLN;Synoptique – CVC;10
+Bâtiment;Plans - Dossier des Ouvrages Exécutés;PLN;Synoptique – VRD;11
+Bâtiment;Plans - Dossier des Ouvrages Exécutés;PLN;Dossier des Ouvrages Exécutés (DOE);12
+Bâtiment;Plans - Dossier des Ouvrages Exécutés;PLN;Dossier d'Intervention Ultérieure sur les Ouvrages (DIUO);13
+Bâtiment;Plans - Dossier des Ouvrages Exécutés;PLN;Organigramme des services;14
+Bâtiment;Plans - Dossier des Ouvrages Exécutés;PLN;Organigramme des clés;15
+Bâtiment;Dossier Sécurité;SEC;Date dernière visite de la Commission de Sécurité;16
+Bâtiment;Dossier Sécurité;SEC;Dernier PV de la Commission de Sécurité;17
+Bâtiment;Dossier Sécurité;SEC;Date prochaine visite de la Commission de Sécurité;18
+Bâtiment;Dossier Sécurité;SEC;Registre de sécurité ERT/ERP;19
+Bâtiment;Dossier Sécurité;SEC;Dossier d'identité SSI;20
+Bâtiment;Dossier Sécurité;SEC;Plans et signalétique moyens de secours;21
+Bâtiment;Dossier Sécurité;SEC;RVRAT (rapport de vérification réglementaire après travaux) de la dernière opération;22
+Bâtiment;Diagnostics du bâtiment;DIA;Diagnostic Amiante;23
+Bâtiment;Diagnostics du bâtiment;DIA;Diagnostic Plomb;24
+Bâtiment;Diagnostics du bâtiment;DIA;Diagnostic termites et parasites;25
+Bâtiment;Diagnostics du bâtiment;DIA;Diagnostic légionelle;26
+Bâtiment;Diagnostics du bâtiment;DIA;Diagnostic Structure;27
+Bâtiment;Diagnostics du bâtiment;DIA;Diagnostic Radon;28
+Bâtiment;Diagnostics du bâtiment;DIA;Diagnostic accessibilité handicapés;29
+Bâtiment;Diagnostics du bâtiment;DIA;Diagnostic Performance énergétique (DPE);30
+Bâtiment;Contrôles périodiques des installations;RAP;Système de sécurité incendie;31
+Bâtiment;Contrôles périodiques des installations;RAP;Moyens de secours : extincteurs, RIA;32
+Bâtiment;Contrôles périodiques des installations;RAP;Installations électriques;33
+Bâtiment;Contrôles périodiques des installations;RAP;Installations de chauffage;34
+Bâtiment;Contrôles périodiques des installations;RAP;Installation de gaz combustibles;35
+Bâtiment;Contrôles périodiques des installations;RAP;Ascenseurs et monte- charges;36
+Bâtiment;Contrôles périodiques des installations;RAP;Installation de cuisine: hotte, filtre, ramonage et vacuité du conduit;37
+Bâtiment;Contrôles périodiques des installations;RAP;Appareils de cuisson: gaz, électrique;38
+Bâtiment;Contrôles périodiques des installations;RAP;Conduits de fumée: ramonage;39
+Bâtiment;Contrôles périodiques des installations;RAP;Portes automatiques;40
+Bâtiment;Contrôles périodiques des installations;RAP;Garde-corps et fenêtres basses;41
+Bâtiment;Contrôles périodiques des installations;RAP;Groupe électrogène;42
+Bâtiment;Contrôles périodiques des installations;RAP;Lignes de vie;43
+Bâtiment;Contrôles périodiques des installations;RAP;Système de désenfumage;44
+Bâtiment;Contrôles périodiques des installations;RAP;Eclairage de sécurité;45
+Bâtiment;Contrôles périodiques des installations;RAP;Carnet sanitaire de l'eau;46

@@ -1,0 +1,25 @@
+﻿niveau;libelle;aide
+Site;Nom du site;
+Site;Adresse postale;
+Site;Contact Direction d'établissement;NOM Prénom - téléphone - mail
+Site;Contact Responsable technique;NOM Prénom - téléphone - mail
+Site;Activité(s) du site;
+Site;Etat du patrimoine;Propriétaire/Locataire
+Site;Année d'acquisition;
+Site;Superficie terrain;
+Site;Superficie des bâtiments (planchers);
+Site;Superficie des stationnements aériens;
+Site;Nbr de places de stationnement;
+Bâtiment;Nom du bâtiment;
+Bâtiment;Activité(s) du bâtiment;
+Bâtiment;Statut d'occupation;propriétaire, locataire, mise à disposition, copropriété, crédit-bail, autre
+Bâtiment;Année de construction;
+Bâtiment;Superficie terrain;
+Bâtiment;Superficie du bâtiment (surface de tous les planchers);
+Bâtiment;Nombre d'étages;
+Bâtiment;Hauteur du plancher bas du dernier étage;
+Bâtiment;Effectifs admissibles (public + personnel);
+Bâtiment;Nombre de lits;
+Bâtiment;Statut d'établissement;ERP, HAB, ERT, ICPE, Autres, etc…, Non concerné
+Bâtiment;Si ERP, Type d'établissement;J, L, R, U, W, etc…, Non concerné
+Bâtiment;Si ERP, Catégorie de l'établissement;1ère, 2ème, 3ème, 4ème, 5ème, Non concerné
