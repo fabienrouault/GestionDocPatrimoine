@@ -21,6 +21,8 @@ La différence territorial / établissement ne vient **pas** du rôle mais de l'
 - établissement → relié à un ou plusieurs **établissements** : ne voit que ceux-là.
 
 ## 3. Autorisations de table (rôle `Responsable technique`)
+> **Mode d'emploi détaillé, pas à pas : [`autorisations-pas-a-pas.md`](autorisations-pas-a-pas.md).** (Il fait foi pour les privilèges, notamment « Ajouter à ».)
+
 Les autorisations s'additionnent : la personne voit l'union de ses établissements « par territoire » et « par établissement ».
 Deux chaînes d'accès sont donc créées, chacune avec sa propre racine :
 
