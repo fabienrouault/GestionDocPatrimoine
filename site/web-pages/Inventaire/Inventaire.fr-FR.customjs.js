@@ -319,7 +319,7 @@
           '<div class="fsjd-row fsjd-row-h"><div>Document</div><div>Statut</div><div>Date du document</div><div>Priorité</div><div>Fichier</div><div>Commentaire</div></div>';
       }
       html += '<div class="fsjd-row s-' + statutClass(r.fsjd_statut) + '" data-kind="' + kind + '" data-i="' + i + '">' +
-        '<div class="fsjd-lab">' + esc(m.fsjd_name) + '</div>' +
+        '<div class="fsjd-lab">' + esc(m.fsjd_name) + (r.fsjd_modifiepar ? '<span class="fsjd-by">Modifié par ' + esc(r.fsjd_modifiepar) + '</span>' : '') + '</div>' +
         '<div><select aria-label="Statut" data-f="fsjd_statut" data-t="choice">' + opts(STATUT, r.fsjd_statut, 'À renseigner') + '</select></div>' +
         '<div><input aria-label="Date du document" type="date" data-f="fsjd_datedocument" data-t="date" value="' + esc(r.fsjd_datedocument || '') + '"></div>' +
         '<div><select aria-label="Priorité" data-f="fsjd_priorite" data-t="choice">' + opts(PRIORITE, r.fsjd_priorite) + '</select></div>' +
@@ -350,6 +350,7 @@
 
   /* Enregistrement sérialisé par ligne (création paresseuse au premier changement) */
   function saveRow(it, patch) {
+    patch.fsjd_modifiepar = USER.name;
     it.q = (it.q || Promise.resolve()).then(function () {
       if (it.rec && it.rec.id) {
         return api.update(it.set, it.rec.id, patch).then(function () { Object.assign(it.rec, patch); });
@@ -372,7 +373,8 @@
     if (!isContrat && (!it.rec || it.rec.fsjd_statut == null)) { patch.fsjd_statut = 100000000; }
     (isContrat ? Promise.resolve() : saveRow(it, patch)).then(function () {
       if (!it.rec || !it.rec.id) { throw new Error('enregistrement impossible'); }
-      return api.upload(it.set, it.rec.id, 'fsjd_fichier', file);
+      return (isContrat ? api.update(it.set, it.rec.id, { fsjd_modifiepar: USER.name }) : Promise.resolve())
+        .then(function () { return api.upload(it.set, it.rec.id, 'fsjd_fichier', file); });
     }).then(function () {
       it.rec.fsjd_fichier_name = file.name;
       if (!isContrat) {
@@ -413,7 +415,7 @@
       (type === 'Maintenance' ? cf(c, 'fsjd_equipements', 'Nature des équipements', 'text') : '') +
       cf(c, 'fsjd_criticite', 'Criticité / remarque', 'text') +
       '<div class="fsjd-field"><label>Contrat (fichier)</label><div class="fsjd-file">' + uploadBtn() + '<span class="fsjd-fileinfo">' + fileCell(c) + '</span></div></div>' +
-      '<div class="fsjd-ctail">' + alert + '<button type="button" class="btn btn-xs btn-link" data-act="delcontrat">Supprimer</button></div></div>';
+      '<div class="fsjd-ctail">' + (c.fsjd_modifiepar ? '<span class="fsjd-by">Modifié par ' + esc(c.fsjd_modifiepar) + '</span>' : '') + alert + '<button type="button" class="btn btn-xs btn-link" data-act="delcontrat">Supprimer</button></div></div>';
   }
   function cf(c, k, l, t) {
     return '<div class="fsjd-field"><label>' + esc(l) + '</label><input type="' + t + '" data-f="' + k + '" data-t="' + (t === 'date' ? 'date' : 'text') + '" value="' + esc(c[k] || '') + '"></div>';
@@ -431,7 +433,7 @@
       return { m: m, rec: r || null, base: b, set: set };
     });
   }
-  var DOC_SELECT = '$select=fsjd_documentinventaireid,_fsjd_modele_value,fsjd_statut,fsjd_datedocument,fsjd_priorite,fsjd_commentaire,fsjd_fichier_name,fsjd_lien';
+  var DOC_SELECT = '$select=fsjd_documentinventaireid,_fsjd_modele_value,fsjd_statut,fsjd_datedocument,fsjd_priorite,fsjd_commentaire,fsjd_modifiepar,fsjd_fichier_name,fsjd_lien';
 
   function viewSite(id) {
     root.innerHTML = '<p class="fsjd-loading">Chargement…</p>';
@@ -461,7 +463,7 @@
     return Promise.all([
       loadRef(), api.get(SET.batiment, id),
       api.list(SET.doc, DOC_SELECT + '&$filter=_fsjd_batiment_value eq ' + id),
-      api.list(SET.contrat, '$select=fsjd_contratid,fsjd_famille,fsjd_nature,fsjd_fournisseur,fsjd_echeance,fsjd_reconduction,fsjd_equipements,fsjd_criticite,fsjd_fichier_name,fsjd_lien&$filter=_fsjd_batiment_value eq ' + id)
+      api.list(SET.contrat, '$select=fsjd_contratid,fsjd_famille,fsjd_nature,fsjd_fournisseur,fsjd_echeance,fsjd_reconduction,fsjd_equipements,fsjd_criticite,fsjd_modifiepar,fsjd_fichier_name,fsjd_lien&$filter=_fsjd_batiment_value eq ' + id)
     ]).then(function (r) {
       var R = r[0], bat = r[1], siteId = bat._fsjd_site_value;
       return api.get(SET.site, siteId, '$select=fsjd_name').then(function (site) {
@@ -542,7 +544,8 @@
     var f = el.getAttribute('data-f'), ri = rowItem(el);
     if (!f || !ri) { return; }
     var val = readValue(el), patch = {}; patch[f] = val;
-    if (ri.contrat) {                                                // ligne de contrat
+    if (ri.contrat) {
+      patch.fsjd_modifiepar = USER.name;                                                // ligne de contrat
       api.update(SET.contrat, ri.contrat.id, patch).then(function () { ri.contrat[f] = val; toast('Enregistré'); if (f === 'fsjd_echeance') { render(true); } },
         function (err) { toast('Échec de l’enregistrement : ' + err.message, 'ko'); });
       return;

@@ -26,7 +26,7 @@ const srv = require('./mock_server');
   const d = srv.db.fsjd_documentinventaires[0];
   assert.equal(d._fsjd_site_value, srv.db.fsjd_sites[0].fsjd_siteid); assert.equal(d.fsjd_statut, 100000002);
   await row.locator('[data-f=fsjd_commentaire]').fill('À rechercher aux archives'); await row.locator('[data-f=fsjd_commentaire]').blur(); await pg.waitForTimeout(200);
-  assert.equal(srv.db.fsjd_documentinventaires.length, 1, 'pas de doublon'); assert.equal(d.fsjd_commentaire, 'À rechercher aux archives');
+  assert.equal(srv.db.fsjd_documentinventaires.length, 1, 'pas de doublon'); assert.equal(d.fsjd_modifiepar, 'Test Utilisateur'); assert.equal(d.fsjd_commentaire, 'À rechercher aux archives');
   // dépôt fichier
   const f = path.join(os.tmpdir(), 'acte.pdf'); fs.writeFileSync(f, 'PDF-test');
   const second = pg.locator('.fsjd-row:not(.fsjd-row-h)').nth(1);
@@ -54,7 +54,7 @@ const srv = require('./mock_server');
   assert.equal(srv.db.fsjd_contrats[0].fsjd_fournisseur, 'Dalkia'); assert.equal(srv.db.fsjd_contrats[0].fsjd_famille, 100000005);
   const [fc3] = await Promise.all([pg.waitForEvent('filechooser'), pg.locator('.fsjd-contrat [data-act=pick]').click()]);
   await fc3.setFiles(f); await pg.waitForTimeout(400);
-  assert.equal(srv.db.fsjd_contrats[0].fsjd_fichier_name, 'acte.pdf');
+  assert.equal(srv.db.fsjd_contrats[0].fsjd_fichier_name, 'acte.pdf'); assert.equal(srv.db.fsjd_contrats[0].fsjd_modifiepar, 'Test Utilisateur');
   // ajout bâtiment depuis la fiche site
   await pg.goto(base + '#/site/' + srv.db.fsjd_sites[0].fsjd_siteid); await pg.waitForSelector('[data-act=addbat]');
   await pg.click('[data-act=addbat]'); await pg.waitForSelector('h1:has-text("Bâtiment B")');

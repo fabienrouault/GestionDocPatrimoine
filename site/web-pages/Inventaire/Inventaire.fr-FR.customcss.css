@@ -48,3 +48,4 @@
 .fsjd-toast { position: fixed; right: 18px; bottom: 18px; padding: 10px 16px; border-radius: 8px; color: #fff; background: var(--ok); box-shadow: 0 6px 20px rgba(0,0,0,.25); opacity: 0; transform: translateY(8px); transition: all .2s; pointer-events: none; z-index: 2000; max-width: 420px; }
 .fsjd-toast.ko { background: var(--ko); } .fsjd-toast.show { opacity: 1; transform: none; }
 @media (max-width: 767px) { .fsjd-bar { width: 90px; } #fsjd-app h1 { font-size: 21px; } }
+.fsjd-by { display: block; font-size: 11px; font-weight: 400; color: #8a94a3; }

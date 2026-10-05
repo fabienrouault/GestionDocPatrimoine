@@ -24,12 +24,18 @@ Les valeurs des listes de choix commencent à **100000000** et suivent l'ordre i
 ### `fsjd_territoire`
 `fsjd_name` (texte, colonne principale).
 
+### Affectation des personnes (plusieurs par établissement)
+Deux relations **plusieurs-à-plusieurs** avec la table `contact`, qui pilotent les droits :
+- `fsjd_territoire_contact` (Territoire ↔ Contact) : **responsables techniques territoriaux** → accès à *tous* les établissements du territoire.
+- `fsjd_site_contact` (Établissement ↔ Contact) : **responsables techniques d'établissement** (et tout autre contributeur) → accès à *cet* établissement seulement.
+
+Un établissement peut ainsi avoir autant de déposants que nécessaire ; une personne peut aussi cumuler les deux niveaux.
+
 ### `fsjd_site`
 | Colonne | Type | Remarque |
 |---|---|---|
 | `fsjd_name` | Texte (principale) | Nom du site |
 | `fsjd_territoire` | Recherche → `fsjd_territoire` | |
-| `fsjd_responsable` | Recherche → `contact` | Responsable technique territorial : **sert aux autorisations** |
 | `fsjd_adresse` | Texte | |
 | `fsjd_contactdirection`, `fsjd_contacttechnique` | Texte | « NOM Prénom - téléphone - mail » |
 | `fsjd_activites` | Texte multiligne | |
@@ -69,6 +75,8 @@ extraits du classeur d'audit). Importer via *Tables → fsjd_modeledocument → 
 | `fsjd_datedocument` | Date seule | |
 | `fsjd_priorite` | Choix : Haute, Moyenne, Basse, Non applicable | |
 | `fsjd_commentaire` | Texte (500) | |
+| `fsjd_modifiepar` | Texte (200) | nom de la dernière personne ayant modifié la ligne (renseigné par le site) |
+| `fsjd_modifiepar` | Texte (200) | nom de la dernière personne ayant modifié la ligne (renseigné par le site) |
 | `fsjd_fichier` | **Fichier** (taille max 128 Mo conseillée) | déposé depuis le site |
 | `fsjd_lien` | URL | renseigné par le flux Power Automate (lien SharePoint/Teams) |
 
@@ -80,13 +88,12 @@ inutile de pré-générer 57 lignes par bâtiment.
 `fsjd_famille` (Choix, 14 valeurs dans cet ordre : Électricité, Gaz, Fuel, Eau potable, Téléphonie / Internet — *énergie* ;
 CVC, Plomberie, Électricité courants forts (CFO), Électricité courants faibles (Cfa), Systèmes de sécurité incendie (SSI),
 Appareils élévateurs, Gestion technique du bâtiment (GTB), Portes et portails, Autres — *maintenance*) ·
-`fsjd_nature`, `fsjd_fournisseur` (fournisseur ou prestataire), `fsjd_reconduction`, `fsjd_equipements`, `fsjd_criticite` (Texte) ·
+`fsjd_nature`, `fsjd_fournisseur` (fournisseur ou prestataire), `fsjd_reconduction`, `fsjd_equipements`, `fsjd_criticite`, `fsjd_modifiepar` (Texte) ·
 `fsjd_echeance` (Date seule) · `fsjd_fichier` (Fichier) · `fsjd_lien` (URL).
 
 ### Table `contact` (existante)
-Aucune colonne à ajouter si l'affectation passe par `fsjd_site.fsjd_responsable`. (Un responsable peut avoir plusieurs
-établissements ; un établissement n'a qu'un responsable. Pour en autoriser plusieurs, passer à une relation N:N
-site ↔ contact et adapter l'autorisation de table.)
+Aucune colonne à ajouter : l'affectation passe par les deux relations N:N ci-dessus.
+En cas de modifications simultanées de la même ligne par deux personnes, la dernière enregistrée l'emporte (champ par champ).
 
 ## Correspondance avec le classeur Excel
 
