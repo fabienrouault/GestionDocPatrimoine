@@ -69,3 +69,23 @@ liste complète pour tout le monde → une autorisation de type **Global** est r
 4. **Rafraîchir Power Pages** : *Power Pages → ⋯ (Actions) → Redémarrer le site*, puis recharger le studio (Ctrl+F5) et rouvrir l'autorisation.
 5. Vérifier que l'environnement du site Power Pages est bien **le même** que celui où vous avez créé les tables (sélecteur d'environnement en haut à droite).
 6. Si rien n'y fait, recréer la relation N:N depuis la table **Contact** (*Relations → Ajouter → Plusieurs-à-plusieurs → table associée `fsjd_site`*), publier, puis recommencer l'étape 3.
+
+## Dépannage : les relations existent dans Power Apps mais pas dans « Autorisations enfants »
+La liste des relations du studio Power Pages est mise en cache ; une relation (ou une colonne de recherche) créée récemment peut ne pas y apparaître.
+1. **Publier** toutes les personnalisations (Power Apps → Solutions), puis **Redémarrer le site** (Power Pages → ⋯ → Redémarrer le site).
+2. Fermer le studio, se déconnecter/reconnecter, rouvrir dans une **fenêtre de navigation privée**.
+3. Enregistrer l'autorisation **parent** avant d'ouvrir l'onglet *Autorisations enfants* ; dans l'enfant, choisir la table **dans la liste** (loupe).
+4. **Solution de contournement fiable : l'application « Gestion du portail »** (Power Pages → ⋯ → *Gestion du portail*, ou make.powerapps.com → Applications).
+   Menu **Sécurité → Autorisations de table → + Nouveau**. Les relations s'y saisissent par leur **nom de schéma** (texte libre) :
+   | Champ | Valeur |
+   |---|---|
+   | Nom | ex. « Bâtiments – par site (B) » |
+   | Nom logique de la table | `craba_fsjd_batiment` |
+   | Étendue | *Parent* |
+   | Autorisation de table parente | l'autorisation « Site – par contact » |
+   | Relation parente | nom de schéma de la relation **1-N** (voir ci-dessous) |
+   | Privilèges | cocher Lire, Écrire, Créer, Ajouter, Ajouter à… |
+   Pour une étendue *Contact* : champ **Relation avec le contact** = nom de schéma de la relation N:N (ex. `craba_fsjd_site_contact`).
+5. **Trouver le nom de schéma d'une relation** : Power Apps → Tables → table enfant (ex. `fsjd_batiment`) → *Relations* → cliquer la relation vers `fsjd_site`
+   → le champ **Nom de la relation** / « Nom de schéma » (ex. `craba_fsjd_site_fsjd_batiment`). Pour un N:N, même chose sur la relation vers Contact.
+   Astuce : *Options avancées* de la relation affiche aussi ce nom.
