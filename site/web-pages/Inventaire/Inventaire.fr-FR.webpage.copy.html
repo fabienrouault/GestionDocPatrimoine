@@ -2,6 +2,14 @@
   <div id="fsjd-app" data-user-name="{{ user.fullname | escape }}" data-pilotage="{% if user.roles contains 'Pilotage FSJD' %}1{% endif %}">
     <p class="fsjd-loading">Chargement…</p>
   </div>
+  <script>
+    setTimeout(function () {
+      var el = document.querySelector('#fsjd-app > .fsjd-loading');
+      if (el && !window.FSJD_BOOT) {
+        el.textContent = 'Le script de la page ne s’est pas exécuté (JavaScript non publié ou en erreur). Ouvrez la console du navigateur (F12) pour le détail.';
+      }
+    }, 6000);
+  </script>
   <noscript><p>JavaScript est nécessaire pour utiliser l’inventaire documentaire.</p></noscript>
 {% else %}
   <div class="fsjd-empty">

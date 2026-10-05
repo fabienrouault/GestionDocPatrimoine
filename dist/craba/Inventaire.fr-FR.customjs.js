@@ -93,6 +93,7 @@
   /* Utilitaires                                                          */
   /* ------------------------------------------------------------------ */
   var root = document.getElementById('fsjd-app');
+  window.FSJD_BOOT = true;           // signale à la page que le script a démarré
   if (!root) { return; }
   var USER = { name: root.getAttribute('data-user-name') || '', pilotage: root.getAttribute('data-pilotage') === '1' };
 
@@ -129,8 +130,10 @@
     function token() {
       if (!tokenP) {
         tokenP = new Promise(function (res, rej) {
-          if (window.shell && shell.getTokenDeferred) { shell.getTokenDeferred().done(res).fail(rej); }
-          else { res(''); }
+          if (window.shell && shell.getTokenDeferred) {
+            shell.getTokenDeferred().done(res).fail(rej);
+            setTimeout(function () { rej(new Error('Jeton de sécurité Power Pages indisponible (délai dépassé) : reconnectez-vous.')); }, 15000);
+          } else { res(''); }
         });
       }
       return tokenP;
