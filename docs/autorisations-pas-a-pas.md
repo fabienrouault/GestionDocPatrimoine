@@ -58,3 +58,14 @@ Connectez-vous avec un contact de test relié à **un seul** établissement : la
 puis le dépôt d'un fichier doivent fonctionner. Puis avec un territorial (tous les établissements du territoire) et enfin avec `Pilotage FSJD`.
 Symptômes : liste vide → relation ou rôle manquant ; erreur 403 à la création → privilège **A / AÀ** manquant sur la table concernée ;
 liste complète pour tout le monde → une autorisation de type **Global** est restée sur `site`.
+
+## Dépannage : « Aucune relation trouvée » (type d'accès *Accès au contact*)
+À essayer dans cet ordre :
+1. **Resélectionner la table** : dans le champ *Table*, ouvrez la loupe et **choisissez la ligne dans la liste** (ne pas se contenter de taper le nom).
+   Si le bloc « Tables associées » reste vide, la table n'est pas reconnue.
+2. **Vérifier la relation** (make.powerapps.com → Tables → `fsjd_site` → *Relations*) : elle doit être de type **Plusieurs-à-plusieurs** et relier
+   `fsjd_site` à la table standard **Contact** (nom affiché « Contact », nom logique `contact`), et non à une table personnalisée portant un nom voisin.
+3. **Publier** : *Solutions → Publier toutes les personnalisations* (une relation créée mais non publiée n'apparaît pas).
+4. **Rafraîchir Power Pages** : *Power Pages → ⋯ (Actions) → Redémarrer le site*, puis recharger le studio (Ctrl+F5) et rouvrir l'autorisation.
+5. Vérifier que l'environnement du site Power Pages est bien **le même** que celui où vous avez créé les tables (sélecteur d'environnement en haut à droite).
+6. Si rien n'y fait, recréer la relation N:N depuis la table **Contact** (*Relations → Ajouter → Plusieurs-à-plusieurs → table associée `fsjd_site`*), publier, puis recommencer l'étape 3.
