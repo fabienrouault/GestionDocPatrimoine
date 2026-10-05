@@ -49,6 +49,12 @@ Création/rattachement des établissements et affectation des personnes : par l'
 par modèle (Dataverse), pas depuis le portail.
 
 ## 4. API Web (paramètres du site)
+**Où ?** Il n'y a pas d'écran « API Web » dédié : ce sont des **paramètres du site**, à créer dans l'application **Gestion du portail**
+(Power Pages → ⋯ à côté du site → *Gestion du portail*) → menu **Paramètres du site** → **+ Nouveau**
+(champs *Nom*, *Site web* = votre site, *Valeur*). Une fois créés, redémarrez le site (⋯ → *Redémarrer le site*).
+Avec le préfixe `craba_`, le nom est par exemple `Webapi/craba_fsjd_site/enabled` = `true` et `Webapi/craba_fsjd_site/fields` = `*`,
+soit **12 paramètres** au total (2 par table, pour les 6 tables).
+
 Ajoutez, pour **chacune** des 6 tables `fsjd_*` (remplacer `<table>` par le nom logique) :
 
 | Nom | Valeur |
