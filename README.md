@@ -7,6 +7,30 @@ les contrats d'énergie et de maintenance (fournisseur, échéance…), et de **
 Par rapport au premier site (orienté « vitrine client ») : plus de pages marketing, accès réservé aux comptes professionnels,
 un seul outil de saisie et un tableau d'avancement.
 
+## Version autonome (sans Power Pages)
+`standalone/Inventaire_Patrimoine.html` : la même application dans **un seul fichier HTML**, à ouvrir par double-clic
+(Chrome ou Edge), sans serveur ni compte. Le responsable technique prépare l'inventaire sur son ordinateur :
+- au premier lancement, il choisit un **dossier** (local, ou Teams / OneDrive synchronisé) ; tout y est enregistré automatiquement :
+  ```
+  inventaire-donnees.json            saisies (établissements, bâtiments, statuts, dates, commentaires, contrats)
+  inventaire-donnees.backup.json     état avant la 1re écriture de la session
+  sauvegardes/                       une copie par jour (10 jours) + copies en cas de conflit
+  fichiers/<Établissement>/_Site/<Catégorie>/<NN - Document>/…
+  fichiers/<Établissement>/<Bâtiment>/<Catégorie>/<NN - Document>/…
+  fichiers/<Établissement>/<Bâtiment>/Contrats/<Énergie | Maintenance>/<Famille>/…
+  corbeille/<date>/…                 fichiers retirés (jamais supprimés définitivement)
+  ```
+- dépôt de fichiers par bouton ou glisser-déposer sur la ligne ; renommer un établissement ou un bâtiment range ses fichiers dans le nouveau dossier ;
+- menu ☰ : **export en dossier compressé (.zip)** (tout l'inventaire, ou un établissement depuis sa fiche) contenant le JSON,
+  les fichiers, deux synthèses CSV (documents, contrats), l'outil HTML et un LISEZMOI ; **import d'un .zip** (ajout ou remplacement) ;
+  vérification de la présence des fichiers ;
+- si le fichier de données est modifié ailleurs (autre poste, synchronisation), l'enregistrement est suspendu et l'outil demande
+  quelle version garder (l'autre est copiée dans `sauvegardes/`) ;
+- Firefox / Safari (pas d'accès aux dossiers) : les données restent dans le navigateur, à exporter en .zip.
+
+Le catalogue des documents est recopié de `data/modeles_documents.csv` par `python scripts/build_standalone.py` (clés `S01…`, `B01…`
+liées aux saisies : ne pas renuméroter les documents existants). Test : `PLAYWRIGHT_PATH=<module playwright> node tests/standalone.js`.
+
 ## Contenu du dépôt
 | Chemin | Rôle |
 |---|---|
@@ -18,7 +42,9 @@ un seul outil de saisie et un tableau d'avancement.
 | `docs/depot-teams.md` | Flux Power Automate vers le dossier Teams |
 | `data/*.csv` | Catalogue extrait de l'Excel (57 documents, 24 champs, 14 familles de contrats) |
 | `scripts/extract_catalogue.py` | Régénère les CSV depuis le classeur |
-| `tests/` | Faux serveur Power Pages + test de bout en bout (Playwright) |
+| `standalone/Inventaire_Patrimoine.html` | Version autonome (fichier HTML unique, dossier local + export .zip) |
+| `scripts/build_standalone.py` | Recopie le catalogue CSV dans la version autonome |
+| `tests/` | Faux serveur Power Pages + tests de bout en bout (Playwright), dont `standalone.js` |
 
 ## Mise en service (ordre conseillé)
 1. **Dataverse** (si votre préfixe d'éditeur n'est pas vide, voir `scripts/apply_prefix.py` ; version `craba_` fournie dans `dist/craba/`) : créer les 6 tables selon `docs/modele-donnees.md`, importer `data/modeles_documents.csv`,

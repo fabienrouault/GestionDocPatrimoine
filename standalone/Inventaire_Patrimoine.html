@@ -1,0 +1,1530 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Inventaire documentaire du patrimoine</title>
+<style>
+:root { --brand: #102a4a; --brand-2: #3a9ad9; --ok: #1f9d63; --warn: #e08a14; --ko: #d93f49; --na: #8a94a3; --line: #e3e8ef; --bg: #f5f7fa; }
+* { box-sizing: border-box; }
+body { margin: 0; font: 14px/1.45 "Segoe UI", system-ui, -apple-system, Roboto, Arial, sans-serif; color: #1d2733; background: var(--bg); }
+a { color: var(--brand-2); }
+#top { position: sticky; top: 0; z-index: 50; display: flex; align-items: center; gap: 14px; flex-wrap: wrap; padding: 10px 20px; background: var(--brand); color: #fff; box-shadow: 0 2px 8px rgba(0,0,0,.18); }
+#top .brand { font-weight: 700; font-size: 16px; text-decoration: none; color: #fff; }
+#top .brand small { font-weight: 400; opacity: .7; margin-left: 6px; }
+#top .grow { flex: 1; }
+#storage { font-size: 12.5px; opacity: .9; display: flex; align-items: center; gap: 6px; }
+#storage .dot { width: 9px; height: 9px; border-radius: 50%; background: #8a94a3; display: inline-block; }
+#storage .dot.ok { background: #4cd38f; } #storage .dot.pending { background: #f3c14b; } #storage .dot.ko { background: #ff6b74; }
+#who { font-size: 12.5px; }
+#who button { color: #cfe6f7; }
+.menu { position: relative; }
+.menu > summary { list-style: none; cursor: pointer; }
+.menu > summary::-webkit-details-marker { display: none; }
+.menu-items { position: absolute; right: 0; top: calc(100% + 6px); background: #fff; color: #1d2733; border-radius: 8px; box-shadow: 0 10px 30px rgba(0,0,0,.25); min-width: 290px; padding: 6px; z-index: 60; }
+.menu-items button { display: block; width: 100%; text-align: left; padding: 8px 10px; border: 0; background: none; border-radius: 6px; cursor: pointer; font: inherit; color: inherit; }
+.menu-items button:hover { background: #eef3f9; }
+.menu-items hr { border: 0; border-top: 1px solid var(--line); margin: 4px 0; }
+
+#banner:empty { display: none; }
+#banner { padding: 10px 20px; background: #fdecd0; color: #5d3a00; border-bottom: 1px solid #f0c98a; display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+#banner.ko { background: #fbe3e5; color: #7a1d24; border-color: #f1b4b9; }
+
+#app { max-width: 1280px; margin: 0 auto; padding: 8px 16px 64px; }
+#app h1 { font-size: 26px; font-weight: 700; color: var(--brand); margin: 8px 0; }
+#app h2 { font-size: 18px; font-weight: 700; color: var(--brand); margin: 0 0 14px; display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap; }
+#app h2 small { display: flex; align-items: center; gap: 8px; font-weight: 400; }
+#app h3 { font-size: 15px; font-weight: 700; margin: 22px 0 8px; color: #44546a; text-transform: uppercase; letter-spacing: .04em; }
+.head { display: flex; justify-content: space-between; align-items: center; gap: 16px; flex-wrap: wrap; margin-bottom: 12px; }
+.head-actions { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+.topprog { display: flex; align-items: center; gap: 10px; min-width: 260px; }
+.crumb { margin: 8px 0; color: #5b6b7f; }
+.card { background: #fff; border: 1px solid var(--line); border-radius: 10px; padding: 18px 20px; margin: 16px 0; box-shadow: 0 1px 3px rgba(16,42,74,.06); }
+.sub { color: #6b7a8d; font-size: 12.5px; }
+.empty { padding: 40px 16px; text-align: center; color: #5b6b7f; }
+.welcome { max-width: 720px; margin: 40px auto; }
+.welcome ol { padding-left: 20px; } .welcome li { margin: 4px 0; }
+.welcome .choices { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 16px; }
+code { background: #eef1f6; padding: 1px 5px; border-radius: 4px; font-size: 12.5px; }
+
+.btn { display: inline-block; padding: 7px 14px; border-radius: 6px; border: 1px solid #cfd7e2; background: #fff; color: #1d2733; font: inherit; cursor: pointer; text-decoration: none; }
+.btn:hover { background: #f0f4f9; }
+.btn-primary { background: var(--brand-2); border-color: var(--brand-2); color: #fff; }
+.btn-primary:hover { background: #2a86c3; }
+.btn-light { background: rgba(255,255,255,.12); border-color: rgba(255,255,255,.35); color: #fff; }
+.btn-light:hover { background: rgba(255,255,255,.22); }
+.btn-sm { padding: 4px 10px; font-size: 13px; }
+.btn-xs { padding: 2px 8px; font-size: 12px; }
+.btn-link { border: 0; background: none; color: var(--brand-2); padding: 2px 4px; cursor: pointer; font: inherit; font-size: 12px; }
+.btn-link:hover { text-decoration: underline; background: none; }
+.btn-danger { color: var(--ko); }
+
+.bar { display: inline-block; width: 140px; height: 8px; background: #e6ebf2; border-radius: 99px; overflow: hidden; vertical-align: middle; }
+.bar span { display: block; height: 100%; background: linear-gradient(90deg, var(--brand-2), var(--ok)); }
+.pct { margin-left: 8px; font-weight: 600; font-size: 12.5px; }
+
+.sites { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 14px; }
+.site { display: flex; flex-direction: column; gap: 6px; padding: 14px 16px; border: 1px solid var(--line); border-radius: 10px; text-decoration: none; color: inherit; background: var(--bg); transition: box-shadow .15s, transform .15s; }
+.site:hover { box-shadow: 0 8px 22px rgba(16,42,74,.14); transform: translateY(-2px); }
+.site strong { color: var(--brand); font-size: 15px; }
+.chips em, .gp em, .contrat em, .alerts em { font-style: normal; font-size: 11.5px; padding: 2px 8px; border-radius: 99px; background: #e6ebf2; color: #44546a; margin-right: 6px; white-space: nowrap; }
+em.ko { background: #fbe3e5 !important; color: #a82a33 !important; }
+em.warn { background: #fdecd0 !important; color: #8a5200 !important; }
+.alerts { width: 100%; border-collapse: collapse; }
+.alerts td, .alerts th { text-align: left; padding: 6px 8px; border-bottom: 1px solid #eef1f6; font-size: 13px; }
+.alerts th { font-size: 11.5px; text-transform: uppercase; color: #6b7a8d; }
+
+.grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 12px 18px; }
+.field label { display: block; font-size: 12px; font-weight: 600; color: #5b6b7f; margin-bottom: 3px; }
+#app input[type=text], #app input[type=number], #app input[type=date], #app select, #app textarea { width: 100%; padding: 6px 8px; border: 1px solid #cfd7e2; border-radius: 6px; background: #fff; font: inherit; font-size: 13.5px; }
+#app input:focus, #app select:focus, #app textarea:focus { outline: 2px solid var(--brand-2); outline-offset: 0; }
+
+.bats { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
+.bat { display: flex; flex-direction: column; gap: 4px; padding: 8px 14px; border-radius: 8px; border: 1px solid var(--line); background: var(--bg); color: var(--brand); font-weight: 600; text-decoration: none; }
+.bat .bar { width: 110px; }
+
+.toolbar { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; margin-bottom: 6px; }
+.toolbar select { width: auto !important; }
+.group { border: 1px solid var(--line); border-radius: 8px; margin: 10px 0; background: #fff; }
+.group > summary { display: flex; justify-content: space-between; align-items: center; padding: 10px 14px; cursor: pointer; font-weight: 600; background: #f0f4f9; border-radius: 8px; }
+.rows { padding: 6px 12px 12px; overflow-x: auto; }
+.row { display: grid; grid-template-columns: minmax(200px, 3fr) 140px 135px 110px minmax(170px, 1.7fr) minmax(140px, 2fr); gap: 8px 10px; align-items: center; padding: 7px 8px; border-bottom: 1px solid #eef1f6; border-left: 4px solid transparent; min-width: 930px; }
+.row-h { font-size: 11.5px; text-transform: uppercase; letter-spacing: .04em; color: #6b7a8d; font-weight: 700; border-left-color: transparent !important; }
+.row.s-ok { border-left-color: var(--ok); } .row.s-warn { border-left-color: var(--warn); }
+.row.s-ko { border-left-color: var(--ko); } .row.s-na { border-left-color: var(--na); }
+.row.hidden { display: none; }
+.row.drop, .contrat.drop { background: #e7f3fc; outline: 2px dashed var(--brand-2); }
+.lab { font-weight: 500; }
+.by { display: block; font-size: 11px; font-weight: 400; color: #8a94a3; }
+.files { display: flex; flex-direction: column; gap: 2px; align-items: flex-start; font-size: 12px; min-width: 0; }
+.files .f { display: flex; gap: 2px; align-items: center; max-width: 100%; }
+.files .f a { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; cursor: pointer; }
+.files .f.missing a { color: var(--ko); text-decoration: line-through; }
+
+.contrat { display: grid; grid-template-columns: repeat(auto-fill, minmax(190px, 1fr)); gap: 10px 14px; padding: 12px; margin: 8px 0; border: 1px dashed #c5cfdd; border-radius: 8px; background: #fafbfd; }
+.ctail { display: flex; align-items: flex-end; justify-content: space-between; gap: 6px; flex-wrap: wrap; }
+
+#toast { position: fixed; right: 18px; bottom: 18px; padding: 10px 16px; border-radius: 8px; color: #fff; background: var(--ok); box-shadow: 0 6px 20px rgba(0,0,0,.25); opacity: 0; transform: translateY(8px); transition: all .2s; pointer-events: none; z-index: 2000; max-width: 460px; }
+#toast.ko { background: var(--ko); } #toast.info { background: var(--brand); } #toast.show { opacity: 1; transform: none; }
+@media (max-width: 767px) { .bar { width: 90px; } #app h1 { font-size: 21px; } #top { padding: 8px 12px; } }
+@media print { #top, #banner, .btn, .btn-link, .toolbar { display: none !important; } .card { box-shadow: none; } }
+</style>
+</head>
+<body>
+<header id="top">
+  <a class="brand" href="#/">Inventaire documentaire du patrimoine<small>FSJD</small></a>
+  <span class="grow"></span>
+  <span id="storage"></span>
+  <span id="who"></span>
+  <button type="button" class="btn btn-light btn-sm" data-act="export-zip" id="btn-zip">Exporter (.zip)</button>
+  <details class="menu" id="menu">
+    <summary class="btn btn-light btn-sm" title="Autres actions">☰</summary>
+    <div class="menu-items">
+      <button type="button" data-act="export-zip">Exporter tout l'inventaire en dossier compressé (.zip)</button>
+      <button type="button" data-act="export-csv">Exporter la synthèse des documents (.csv)</button>
+      <button type="button" data-act="export-csv-contrats">Exporter la synthèse des contrats (.csv)</button>
+      <hr>
+      <button type="button" data-act="import-zip">Importer un inventaire (.zip)…</button>
+      <button type="button" data-act="check-files">Vérifier la présence des fichiers</button>
+      <hr>
+      <button type="button" data-act="link-folder">Changer de dossier de l'inventaire…</button>
+      <button type="button" data-act="unlink-folder">Délier le dossier</button>
+    </div>
+  </details>
+</header>
+<div id="banner"></div>
+<main id="app"><p class="empty">Chargement…</p></main>
+<div id="toast" role="status"></div>
+<script>
+/* Inventaire documentaire du patrimoine – FSJD — version autonome (un seul fichier HTML, sans serveur).
+ * Reprend l'application Power Pages (site/web-pages/Inventaire) : établissements → bâtiments → documents attendus
+ * (catalogue du classeur FSJD_Audit_des_sites) + contrats d'énergie et de maintenance.
+ * Stockage : un dossier choisi par l'utilisateur (File System Access API, Chrome / Edge) contenant
+ *   inventaire-donnees.json            toutes les saisies
+ *   inventaire-donnees.backup.json     état du fichier avant la 1re écriture de la session
+ *   sauvegardes/                       copie quotidienne (10 jours) + copies de conflit
+ *   fichiers/<Établissement>/<_Site | Bâtiment>/<Catégorie>/<Document>/…   fichiers déposés
+ *   fichiers/<Établissement>/<Bâtiment>/Contrats/<Énergie | Maintenance>/<Famille>/…
+ *   corbeille/<date>/…                 fichiers retirés (jamais supprimés définitivement)
+ * Sans cette API (Firefox, Safari), tout reste dans le navigateur (localStorage + IndexedDB) : exporter en .zip.
+ */
+(function () {
+  'use strict';
+
+  var SELF_HTML = '<!doctype html>\n' + document.documentElement.outerHTML;   // page vierge, jointe aux exports .zip
+
+  /* ------------------------------------------------------------------ */
+  /* Configuration                                                        */
+  /* ------------------------------------------------------------------ */
+  var DATA_FILE = 'inventaire-donnees.json', BACKUP_FILE = 'inventaire-donnees.backup.json';
+  var BACKUP_DIR = 'sauvegardes', FILES_DIR = 'fichiers', TRASH_DIR = 'corbeille', DAILY_KEEP = 10;
+  var MAX_FILE_MB = 200;
+  var ALERT_DAYS = 90;
+
+  /* Catalogue extrait de data/modeles_documents.csv (k = clé stable, ne pas renuméroter) */
+  var CATALOGUE = /*CATALOGUE:debut*/[
+    {"k": "S01", "niveau": "Site", "n": 1, "code": "ADM", "cat": "Propriété et conformité administrative", "libelle": "Acte de propriété / Bail / contrat de location"},
+    {"k": "S02", "niveau": "Site", "n": 2, "code": "ADM", "cat": "Propriété et conformité administrative", "libelle": "Plan de bornage"},
+    {"k": "S03", "niveau": "Site", "n": 3, "code": "PLN", "cat": "Plans", "libelle": "Plan Topographique"},
+    {"k": "S04", "niveau": "Site", "n": 4, "code": "PLN", "cat": "Plans", "libelle": "Plan masse"},
+    {"k": "S05", "niveau": "Site", "n": 5, "code": "PLN", "cat": "Plans", "libelle": "Plans des réseaux publics d'adduction et de rejet / raccordements"},
+    {"k": "S06", "niveau": "Site", "n": 6, "code": "PLN", "cat": "Plans", "libelle": "Plan VRD (Voirie et Réseaux Divers)"},
+    {"k": "S07", "niveau": "Site", "n": 7, "code": "DIA", "cat": "Diagnostics de site", "libelle": "Rapport géotechnique et hydrogéologique du site"},
+    {"k": "S08", "niveau": "Site", "n": 8, "code": "DIA", "cat": "Diagnostics de site", "libelle": "Diagnostic Pollution des sols"},
+    {"k": "S09", "niveau": "Site", "n": 9, "code": "DIA", "cat": "Diagnostics de site", "libelle": "Diagnostic archéologique préventif"},
+    {"k": "S10", "niveau": "Site", "n": 10, "code": "DIA", "cat": "Diagnostics de site", "libelle": "Diagnostic des réseaux enterrés existants"},
+    {"k": "S11", "niveau": "Site", "n": 11, "code": "DIA", "cat": "Diagnostics de site", "libelle": "Diagnostic HAP (Hydrocarbures Aromatiques Polycycliques) des voiries"},
+    {"k": "B01", "niveau": "Bâtiment", "n": 1, "code": "PLN", "cat": "Plans - Dossier des Ouvrages Exécutés", "libelle": "Dossier du Permis de Construire ou de Démolir"},
+    {"k": "B02", "niveau": "Bâtiment", "n": 2, "code": "PLN", "cat": "Plans - Dossier des Ouvrages Exécutés", "libelle": "Demande d'Autorisation de travaux (dernière réalisée)"},
+    {"k": "B03", "niveau": "Bâtiment", "n": 3, "code": "PLN", "cat": "Plans - Dossier des Ouvrages Exécutés", "libelle": "Plans des niveaux (plan architecte ou relevé géomètre) PDF / DWG"},
+    {"k": "B04", "niveau": "Bâtiment", "n": 4, "code": "PLN", "cat": "Plans - Dossier des Ouvrages Exécutés", "libelle": "Plan des façades"},
+    {"k": "B05", "niveau": "Bâtiment", "n": 5, "code": "PLN", "cat": "Plans - Dossier des Ouvrages Exécutés", "libelle": "Coupes"},
+    {"k": "B06", "niveau": "Bâtiment", "n": 6, "code": "PLN", "cat": "Plans - Dossier des Ouvrages Exécutés", "libelle": "Synoptique – Electricité CFO"},
+    {"k": "B07", "niveau": "Bâtiment", "n": 7, "code": "PLN", "cat": "Plans - Dossier des Ouvrages Exécutés", "libelle": "Synoptique – Electricité Cfa"},
+    {"k": "B08", "niveau": "Bâtiment", "n": 8, "code": "PLN", "cat": "Plans - Dossier des Ouvrages Exécutés", "libelle": "Synoptique – SSI"},
+    {"k": "B09", "niveau": "Bâtiment", "n": 9, "code": "PLN", "cat": "Plans - Dossier des Ouvrages Exécutés", "libelle": "Synoptique – Plomberie"},
+    {"k": "B10", "niveau": "Bâtiment", "n": 10, "code": "PLN", "cat": "Plans - Dossier des Ouvrages Exécutés", "libelle": "Synoptique – CVC"},
+    {"k": "B11", "niveau": "Bâtiment", "n": 11, "code": "PLN", "cat": "Plans - Dossier des Ouvrages Exécutés", "libelle": "Synoptique – VRD"},
+    {"k": "B12", "niveau": "Bâtiment", "n": 12, "code": "PLN", "cat": "Plans - Dossier des Ouvrages Exécutés", "libelle": "Dossier des Ouvrages Exécutés (DOE)"},
+    {"k": "B13", "niveau": "Bâtiment", "n": 13, "code": "PLN", "cat": "Plans - Dossier des Ouvrages Exécutés", "libelle": "Dossier d'Intervention Ultérieure sur les Ouvrages (DIUO)"},
+    {"k": "B14", "niveau": "Bâtiment", "n": 14, "code": "PLN", "cat": "Plans - Dossier des Ouvrages Exécutés", "libelle": "Organigramme des services"},
+    {"k": "B15", "niveau": "Bâtiment", "n": 15, "code": "PLN", "cat": "Plans - Dossier des Ouvrages Exécutés", "libelle": "Organigramme des clés"},
+    {"k": "B16", "niveau": "Bâtiment", "n": 16, "code": "SEC", "cat": "Dossier Sécurité", "libelle": "Date dernière visite de la Commission de Sécurité"},
+    {"k": "B17", "niveau": "Bâtiment", "n": 17, "code": "SEC", "cat": "Dossier Sécurité", "libelle": "Dernier PV de la Commission de Sécurité"},
+    {"k": "B18", "niveau": "Bâtiment", "n": 18, "code": "SEC", "cat": "Dossier Sécurité", "libelle": "Date prochaine visite de la Commission de Sécurité"},
+    {"k": "B19", "niveau": "Bâtiment", "n": 19, "code": "SEC", "cat": "Dossier Sécurité", "libelle": "Registre de sécurité ERT/ERP"},
+    {"k": "B20", "niveau": "Bâtiment", "n": 20, "code": "SEC", "cat": "Dossier Sécurité", "libelle": "Dossier d'identité SSI"},
+    {"k": "B21", "niveau": "Bâtiment", "n": 21, "code": "SEC", "cat": "Dossier Sécurité", "libelle": "Plans et signalétique moyens de secours"},
+    {"k": "B22", "niveau": "Bâtiment", "n": 22, "code": "SEC", "cat": "Dossier Sécurité", "libelle": "RVRAT (rapport de vérification réglementaire après travaux) de la dernière opération"},
+    {"k": "B23", "niveau": "Bâtiment", "n": 23, "code": "DIA", "cat": "Diagnostics du bâtiment", "libelle": "Diagnostic Amiante"},
+    {"k": "B24", "niveau": "Bâtiment", "n": 24, "code": "DIA", "cat": "Diagnostics du bâtiment", "libelle": "Diagnostic Plomb"},
+    {"k": "B25", "niveau": "Bâtiment", "n": 25, "code": "DIA", "cat": "Diagnostics du bâtiment", "libelle": "Diagnostic termites et parasites"},
+    {"k": "B26", "niveau": "Bâtiment", "n": 26, "code": "DIA", "cat": "Diagnostics du bâtiment", "libelle": "Diagnostic légionelle"},
+    {"k": "B27", "niveau": "Bâtiment", "n": 27, "code": "DIA", "cat": "Diagnostics du bâtiment", "libelle": "Diagnostic Structure"},
+    {"k": "B28", "niveau": "Bâtiment", "n": 28, "code": "DIA", "cat": "Diagnostics du bâtiment", "libelle": "Diagnostic Radon"},
+    {"k": "B29", "niveau": "Bâtiment", "n": 29, "code": "DIA", "cat": "Diagnostics du bâtiment", "libelle": "Diagnostic accessibilité handicapés"},
+    {"k": "B30", "niveau": "Bâtiment", "n": 30, "code": "DIA", "cat": "Diagnostics du bâtiment", "libelle": "Diagnostic Performance énergétique (DPE)"},
+    {"k": "B31", "niveau": "Bâtiment", "n": 31, "code": "RAP", "cat": "Contrôles périodiques des installations", "libelle": "Système de sécurité incendie"},
+    {"k": "B32", "niveau": "Bâtiment", "n": 32, "code": "RAP", "cat": "Contrôles périodiques des installations", "libelle": "Moyens de secours : extincteurs, RIA"},
+    {"k": "B33", "niveau": "Bâtiment", "n": 33, "code": "RAP", "cat": "Contrôles périodiques des installations", "libelle": "Installations électriques"},
+    {"k": "B34", "niveau": "Bâtiment", "n": 34, "code": "RAP", "cat": "Contrôles périodiques des installations", "libelle": "Installations de chauffage"},
+    {"k": "B35", "niveau": "Bâtiment", "n": 35, "code": "RAP", "cat": "Contrôles périodiques des installations", "libelle": "Installation de gaz combustibles"},
+    {"k": "B36", "niveau": "Bâtiment", "n": 36, "code": "RAP", "cat": "Contrôles périodiques des installations", "libelle": "Ascenseurs et monte- charges"},
+    {"k": "B37", "niveau": "Bâtiment", "n": 37, "code": "RAP", "cat": "Contrôles périodiques des installations", "libelle": "Installation de cuisine: hotte, filtre, ramonage et vacuité du conduit"},
+    {"k": "B38", "niveau": "Bâtiment", "n": 38, "code": "RAP", "cat": "Contrôles périodiques des installations", "libelle": "Appareils de cuisson: gaz, électrique"},
+    {"k": "B39", "niveau": "Bâtiment", "n": 39, "code": "RAP", "cat": "Contrôles périodiques des installations", "libelle": "Conduits de fumée: ramonage"},
+    {"k": "B40", "niveau": "Bâtiment", "n": 40, "code": "RAP", "cat": "Contrôles périodiques des installations", "libelle": "Portes automatiques"},
+    {"k": "B41", "niveau": "Bâtiment", "n": 41, "code": "RAP", "cat": "Contrôles périodiques des installations", "libelle": "Garde-corps et fenêtres basses"},
+    {"k": "B42", "niveau": "Bâtiment", "n": 42, "code": "RAP", "cat": "Contrôles périodiques des installations", "libelle": "Groupe électrogène"},
+    {"k": "B43", "niveau": "Bâtiment", "n": 43, "code": "RAP", "cat": "Contrôles périodiques des installations", "libelle": "Lignes de vie"},
+    {"k": "B44", "niveau": "Bâtiment", "n": 44, "code": "RAP", "cat": "Contrôles périodiques des installations", "libelle": "Système de désenfumage"},
+    {"k": "B45", "niveau": "Bâtiment", "n": 45, "code": "RAP", "cat": "Contrôles périodiques des installations", "libelle": "Eclairage de sécurité"},
+    {"k": "B46", "niveau": "Bâtiment", "n": 46, "code": "RAP", "cat": "Contrôles périodiques des installations", "libelle": "Carnet sanitaire de l'eau"}
+  ]/*CATALOGUE:fin*/;
+
+  var STATUTS = [
+    { l: 'Disponible', c: 'ok' }, { l: 'Obsolète / partiel', c: 'warn' },
+    { l: 'Manquant', c: 'ko' }, { l: 'Non applicable', c: 'na' }
+  ];
+  var PRIORITES = ['Haute', 'Moyenne', 'Basse', 'Non applicable'];
+  var FAMILLES = [
+    { k: 'electricite', l: 'Électricité', type: 'Énergie' },
+    { k: 'gaz', l: 'Gaz', type: 'Énergie' },
+    { k: 'fuel', l: 'Fuel', type: 'Énergie' },
+    { k: 'eau', l: 'Eau potable', type: 'Énergie' },
+    { k: 'telecom', l: 'Téléphonie / Internet', type: 'Énergie' },
+    { k: 'cvc', l: 'CVC', type: 'Maintenance' },
+    { k: 'plomberie', l: 'Plomberie', type: 'Maintenance' },
+    { k: 'cfo', l: 'Électricité courants forts (CFO)', type: 'Maintenance' },
+    { k: 'cfa', l: 'Électricité courants faibles (Cfa)', type: 'Maintenance' },
+    { k: 'ssi', l: 'Systèmes de sécurité incendie (SSI)', type: 'Maintenance' },
+    { k: 'elevateurs', l: 'Appareils élévateurs', type: 'Maintenance' },
+    { k: 'gtb', l: 'Gestion technique du bâtiment (GTB)', type: 'Maintenance' },
+    { k: 'portes', l: 'Portes et portails', type: 'Maintenance' },
+    { k: 'autres', l: 'Autres', type: 'Maintenance' }
+  ];
+  var ETAB_FIELDS = [
+    { k: 'nom', l: "Nom de l'établissement", t: 'text', req: true },
+    { k: 'territoire', l: 'Territoire', t: 'text', list: 'dl-territoires' },
+    { k: 'adresse', l: 'Adresse postale', t: 'text' },
+    { k: 'contact_direction', l: "Contact Direction d'établissement", t: 'text', h: 'NOM Prénom - téléphone - mail' },
+    { k: 'contact_technique', l: 'Contact Responsable technique', t: 'text', h: 'NOM Prénom - téléphone - mail' },
+    { k: 'activites', l: 'Activité(s) du site', t: 'area' },
+    { k: 'etat_patrimoine', l: 'État du patrimoine', t: 'choice', o: ['Propriétaire', 'Locataire'] },
+    { k: 'annee_acquisition', l: "Année d'acquisition", t: 'int' },
+    { k: 'superficie_terrain', l: 'Superficie terrain (m²)', t: 'num' },
+    { k: 'superficie_batiments', l: 'Superficie des bâtiments, planchers (m²)', t: 'num' },
+    { k: 'superficie_stationnements', l: 'Superficie des stationnements aériens (m²)', t: 'num' },
+    { k: 'nb_places_stationnement', l: 'Nombre de places de stationnement', t: 'int' }
+  ];
+  var BAT_FIELDS = [
+    { k: 'nom', l: 'Nom du bâtiment', t: 'text', req: true },
+    { k: 'activites', l: 'Activité(s) du bâtiment', t: 'area' },
+    { k: 'statut_occupation', l: "Statut d'occupation", t: 'choice', o: ['Propriétaire', 'Locataire', 'Mise à disposition', 'Copropriété', 'Crédit-bail', 'Autre'] },
+    { k: 'annee_construction', l: 'Année de construction', t: 'int' },
+    { k: 'superficie_terrain', l: 'Superficie terrain (m²)', t: 'num' },
+    { k: 'superficie_batiment', l: 'Superficie du bâtiment, tous planchers (m²)', t: 'num' },
+    { k: 'nb_etages', l: "Nombre d'étages", t: 'int' },
+    { k: 'hauteur_plancher_bas', l: 'Hauteur du plancher bas du dernier étage (m)', t: 'num' },
+    { k: 'effectif_admissible', l: 'Effectifs admissibles (public + personnel)', t: 'int' },
+    { k: 'nb_lits', l: 'Nombre de lits', t: 'int' },
+    { k: 'statut_etablissement', l: "Statut d'établissement", t: 'choice', o: ['ERP', 'HAB', 'ERT', 'ICPE', 'Autres', 'Non concerné'] },
+    { k: 'type_erp', l: "Si ERP, type d'établissement", t: 'text', h: 'J, L, R, U, W…' },
+    { k: 'categorie_erp', l: "Si ERP, catégorie de l'établissement", t: 'choice', o: ['1ère', '2ème', '3ème', '4ème', '5ème', 'Non concerné'] }
+  ];
+
+  /* ------------------------------------------------------------------ */
+  /* Utilitaires                                                          */
+  /* ------------------------------------------------------------------ */
+  var $app = document.getElementById('app');
+  function esc(s) {
+    return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) {
+      return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c];
+    });
+  }
+  function opts(list, sel, blank) {
+    return '<option value="">' + esc(blank || '—') + '</option>' + list.map(function (o) {
+      return '<option' + (o === sel ? ' selected' : '') + '>' + esc(o) + '</option>';
+    }).join('');
+  }
+  function pad(n, w) { n = String(n); while (n.length < (w || 2)) { n = '0' + n; } return n; }
+  function pct(a, b) { return b ? Math.round(100 * a / b) : 0; }
+  function localDate(d) { d = d || new Date(); return d.getFullYear() + '-' + pad(d.getMonth() + 1) + '-' + pad(d.getDate()); }
+  function stampName(d) { d = d || new Date(); return localDate(d) + '_' + pad(d.getHours()) + pad(d.getMinutes()) + pad(d.getSeconds()); }
+  function nowIso() { return new Date().toISOString(); }
+  function daysTo(d) { return Math.round((new Date(d + 'T00:00:00') - new Date(localDate() + 'T00:00:00')) / 864e5); }
+  function frDate(d) { return d ? d.slice(8, 10) + '/' + d.slice(5, 7) + '/' + d.slice(0, 4) : ''; }
+  function frDateTime(iso) { if (!iso) { return ''; } var d = new Date(iso); return frDate(localDate(d)) + ' ' + pad(d.getHours()) + ':' + pad(d.getMinutes()); }
+  function uid(p) { return p + Date.now().toString(36) + Math.random().toString(36).slice(2, 7); }
+  function sizeLabel(n) { return n < 1024 ? n + ' o' : n < 1048576 ? Math.round(n / 1024) + ' Ko' : (n / 1048576).toFixed(1).replace('.', ',') + ' Mo'; }
+  function byName(a, b) { return String(a.nom || '').localeCompare(String(b.nom || ''), 'fr', { sensitivity: 'base' }); }
+  function vals(o) { return Object.keys(o).map(function (k) { return o[k]; }); }
+
+  /* Segment de chemin valable sous Windows (caractères interdits, noms réservés, longueur) */
+  function seg(s, max) {
+    max = max || 50;
+    s = String(s == null ? '' : s).normalize('NFC').replace(/[\\/:*?"<>|\u0000-\u001f]/g, '-').replace(/\s+/g, ' ').trim();
+    if (s.length > max) { s = s.slice(0, max).trim(); }
+    s = s.replace(/[. ]+$/, '');
+    if (!s) { s = '_'; }
+    if (/^(con|prn|aux|nul|com\d|lpt\d)(\..*)?$/i.test(s)) { s = '_' + s; }
+    return s;
+  }
+  function splitPath(p) { var a = p.split('/'); return { dir: a.slice(0, -1), name: a[a.length - 1] }; }
+  function splitExt(name) { var i = name.lastIndexOf('.'); return i > 0 ? { base: name.slice(0, i), ext: name.slice(i) } : { base: name, ext: '' }; }
+
+  var toastTimer;
+  function toast(msg, kind) {
+    var t = document.getElementById('toast');
+    t.className = (kind || 'ok') + ' show';
+    t.textContent = msg;
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(function () { t.className = ''; }, kind === 'ko' ? 7000 : kind === 'info' ? 4000 : 1800);
+  }
+  function download(blob, name) {
+    var a = document.createElement('a');
+    a.href = URL.createObjectURL(blob); a.download = name;
+    document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(function () { URL.revokeObjectURL(a.href); }, 60000);
+  }
+
+  /* ------------------------------------------------------------------ */
+  /* Données                                                              */
+  /* ------------------------------------------------------------------ */
+  function emptyDB() {
+    return { format: 'fsjd-inventaire', version: 1, cree_le: nowIso(), modifie_le: null,
+      etablissements: {}, batiments: {}, documents: {}, docs_perso: {}, contrats: {} };
+  }
+  function normalize(d) {
+    if (!d || typeof d !== 'object' || d.format !== 'fsjd-inventaire') { throw new Error("ce n'est pas un fichier d'inventaire FSJD"); }
+    var e = emptyDB();
+    Object.keys(e).forEach(function (k) { if (d[k] == null) { d[k] = e[k]; } });
+    vals(d.documents).forEach(function (r) { r.fichiers = r.fichiers || []; });
+    vals(d.contrats).forEach(function (r) { r.fichiers = r.fichiers || []; });
+    return d;
+  }
+  var db = emptyDB();
+
+  var SCOPE = decodeURIComponent(location.pathname.replace(/[^/]*$/, '')).toLowerCase();
+  var HANDLE_KEY = 'dataDir@' + SCOPE, CACHE_KEY = 'fsjd-inventaire@' + SCOPE, USER_KEY = 'fsjd-inventaire-auteur';
+  var auteur = '';
+  try { auteur = localStorage.getItem(USER_KEY) || ''; } catch (e) { /* stockage indisponible */ }
+  function who() {
+    if (!auteur) {
+      var n = window.prompt('Votre nom (affiché sur les lignes que vous modifiez) :', '');
+      auteur = (n || '').trim() || 'Responsable technique';
+      try { localStorage.setItem(USER_KEY, auteur); } catch (e) { /* ignoré */ }
+      renderWho();
+    }
+    return auteur;
+  }
+  function stamp(rec) { rec.modifie_par = who(); rec.modifie_le = nowIso(); }
+
+  /* Modèles de documents attendus pour un établissement (niveau Site) ou un bâtiment */
+  function modelsFor(ownerId) {
+    var niveau = db.etablissements[ownerId] ? 'Site' : 'Bâtiment';
+    var list = CATALOGUE.filter(function (m) { return m.niveau === niveau; });
+    var perso = vals(db.docs_perso).filter(function (p) { return p.owner_id === ownerId; })
+      .sort(function (a, b) { return a.cree_le < b.cree_le ? -1 : 1; })
+      .map(function (p) { return { k: p.id, niveau: niveau, cat: 'Autres documents', code: 'AUT', libelle: p.libelle, perso: true }; });
+    return list.concat(perso);
+  }
+  function docKey(ownerId, k) { return ownerId + '|' + k; }
+  function docRec(ownerId, k) { return db.documents[docKey(ownerId, k)] || null; }
+  function batsOf(etabId) { return vals(db.batiments).filter(function (b) { return b.etab_id === etabId; }).sort(byName); }
+  function contratsOf(batId) { return vals(db.contrats).filter(function (c) { return c.bat_id === batId; }).sort(function (a, b) { return a.cree_le < b.cree_le ? -1 : 1; }); }
+  function famille(k) { return FAMILLES.filter(function (f) { return f.k === k; })[0] || FAMILLES[FAMILLES.length - 1]; }
+  function statutClass(v) { var s = STATUTS.filter(function (x) { return x.l === v; })[0]; return s ? s.c : 'none'; }
+  function isDispo(r) { return r && (r.statut === 'Disponible' || r.statut === 'Obsolète / partiel'); }
+
+  /* Avancement : un document est « traité » dès qu'un statut est choisi */
+  function stats(ownerId) {
+    var s = { total: 0, traite: 0, dispo: 0, manquant: 0, sansFichier: 0 };
+    modelsFor(ownerId).forEach(function (m) {
+      var r = docRec(ownerId, m.k);
+      s.total++;
+      if (!r || !r.statut) { return; }
+      s.traite++;
+      if (isDispo(r)) { s.dispo++; if (!r.fichiers.length) { s.sansFichier++; } }
+      if (r.statut === 'Manquant') { s.manquant++; }
+    });
+    return s;
+  }
+  function addStats(a, b) { Object.keys(a).forEach(function (k) { a[k] += b[k]; }); return a; }
+  function etabStats(etabId) {
+    var s = stats(etabId);
+    batsOf(etabId).forEach(function (b) { addStats(s, stats(b.id)); });
+    return s;
+  }
+  function contratAlerts(filterEtab) {
+    var out = [];
+    vals(db.contrats).forEach(function (c) {
+      var b = db.batiments[c.bat_id]; if (!b || !c.echeance) { return; }
+      if (filterEtab && b.etab_id !== filterEtab) { return; }
+      var d = daysTo(c.echeance);
+      if (d <= ALERT_DAYS) { out.push({ c: c, b: b, e: db.etablissements[b.etab_id], d: d }); }
+    });
+    return out.sort(function (x, y) { return x.d - y.d; });
+  }
+  function bar(done, total) {
+    var p = pct(done, total);
+    return '<span class="bar" title="' + done + ' / ' + total + '"><span style="width:' + p + '%"></span></span><span class="pct">' + p + ' %</span>';
+  }
+
+  /* ------------------------------------------------------------------ */
+  /* Arborescence des fichiers                                            */
+  /* ------------------------------------------------------------------ */
+  function uniqueSeg(rec, siblings, max) {
+    var s = seg(rec.nom, max);
+    var clash = siblings.some(function (o) { return o.id !== rec.id && seg(o.nom, max).toLowerCase() === s.toLowerCase(); });
+    return clash ? seg(rec.nom, max - 7) + ' (' + rec.id.slice(-4) + ')' : s;
+  }
+  function etabSeg(e) { return uniqueSeg(e, vals(db.etablissements), 45); }
+  function batSeg(b) {
+    var s = uniqueSeg(b, batsOf(b.etab_id), 45);
+    return s === '_Site' ? '_Site (bâtiment)' : s;
+  }
+  function ownerDir(ownerId) {
+    var e = db.etablissements[ownerId];
+    if (e) { return [FILES_DIR, etabSeg(e), '_Site']; }
+    var b = db.batiments[ownerId];
+    return [FILES_DIR, etabSeg(db.etablissements[b.etab_id]), batSeg(b)];
+  }
+  function docDir(ownerId, m) {
+    var cat = m.perso ? 'ZZ - Autres documents' : m.code + ' - ' + m.cat;
+    var doc = m.perso ? m.libelle : pad(m.n) + ' - ' + m.libelle;
+    return ownerDir(ownerId).concat([seg(cat, 40), seg(doc, 55)]);
+  }
+  function contratDir(c) {
+    var f = famille(c.famille);
+    return ownerDir(c.bat_id).concat(['Contrats', seg(f.type), seg(f.l, 45)]);
+  }
+  function modelOf(ownerId, k) { return modelsFor(ownerId).filter(function (m) { return m.k === k; })[0]; }
+  /* Toutes les pièces jointes, avec le dossier où elles devraient se trouver */
+  function allAttachments(filterEtab) {
+    var out = [];
+    Object.keys(db.documents).forEach(function (key) {
+      var r = db.documents[key], p = key.split('|'), owner = p[0];
+      var e = db.etablissements[owner] || (db.batiments[owner] && db.etablissements[db.batiments[owner].etab_id]);
+      if (!e || (filterEtab && e.id !== filterEtab)) { return; }
+      var m = modelOf(owner, p[1]); if (!m) { return; }
+      r.fichiers.forEach(function (f) { out.push({ f: f, dir: docDir(owner, m), list: r.fichiers }); });
+    });
+    vals(db.contrats).forEach(function (c) {
+      var b = db.batiments[c.bat_id]; if (!b || (filterEtab && b.etab_id !== filterEtab)) { return; }
+      c.fichiers.forEach(function (f) { out.push({ f: f, dir: contratDir(c), list: c.fichiers }); });
+    });
+    return out;
+  }
+
+  /* ------------------------------------------------------------------ */
+  /* Stockage : dossier (File System Access API) ou navigateur (IndexedDB) */
+  /* ------------------------------------------------------------------ */
+  var FS_OK = typeof window.showDirectoryPicker === 'function';
+  var store = { mode: 'none', dir: null };   // none | reauth | folder | browser
+
+  var idbP = null;
+  function idb() {
+    if (!idbP) {
+      idbP = new Promise(function (res, rej) {
+        var rq = indexedDB.open('fsjd-inventaire', 1);
+        rq.onupgradeneeded = function () { rq.result.createObjectStore('handles'); rq.result.createObjectStore('files'); };
+        rq.onsuccess = function () { res(rq.result); };
+        rq.onerror = function () { rej(rq.error); };
+      });
+    }
+    return idbP;
+  }
+  function idbDo(storeName, mode, fn) {
+    return idb().then(function (d) {
+      return new Promise(function (res, rej) {
+        var tx = d.transaction(storeName, mode), rq = fn(tx.objectStore(storeName));
+        tx.oncomplete = function () { res(rq && rq.result); };
+        tx.onerror = tx.onabort = function () { rej(tx.error); };
+      });
+    });
+  }
+  function idbGet(s, k) { return idbDo(s, 'readonly', function (o) { return o.get(k); }); }
+  function idbPut(s, k, v) { return idbDo(s, 'readwrite', function (o) { return o.put(v, k); }); }
+  function idbDel(s, k) { return idbDo(s, 'readwrite', function (o) { return o.delete(k); }); }
+
+  function dirAt(parts, create) {
+    return parts.reduce(function (p, name) {
+      return p.then(function (d) { return d.getDirectoryHandle(name, { create: !!create }); });
+    }, Promise.resolve(store.dir));
+  }
+  function fileHandle(path, create) {
+    var s = splitPath(path);
+    return dirAt(s.dir, create).then(function (d) { return d.getFileHandle(s.name, { create: !!create }); });
+  }
+  function writeBlob(path, blob) {
+    if (store.mode === 'browser') { return idbPut('files', SCOPE + '|' + path, blob); }
+    return fileHandle(path, true).then(function (fh) {
+      return fh.createWritable().then(function (w) { return w.write(blob).then(function () { return w.close(); }); });
+    });
+  }
+  function readBlob(path) {
+    if (store.mode === 'browser') {
+      return idbGet('files', SCOPE + '|' + path).then(function (b) { if (!b) { throw new Error('fichier introuvable : ' + path); } return b; });
+    }
+    return fileHandle(path, false).then(function (fh) { return fh.getFile(); });
+  }
+  function exists(path) { return readBlob(path).then(function () { return true; }, function () { return false; }); }
+  function removeFile(path) {
+    if (store.mode === 'browser') { return idbDel('files', SCOPE + '|' + path); }
+    var s = splitPath(path);
+    return dirAt(s.dir, false).then(function (d) { return d.removeEntry(s.name); }).then(function () { return pruneEmpty(s.dir); });
+  }
+  /* Supprime les dossiers devenus vides sous fichiers/ (jamais fichiers/ lui-même) */
+  function pruneEmpty(parts) {
+    if (parts.length < 2 || parts[0] !== FILES_DIR) { return Promise.resolve(); }
+    return dirAt(parts, false).then(function (d) {
+      var it = d.values();
+      return it.next().then(function (r) {
+        if (!r.done) { return; }
+        return dirAt(parts.slice(0, -1), false).then(function (p) { return p.removeEntry(parts[parts.length - 1]); })
+          .then(function () { return pruneEmpty(parts.slice(0, -1)); });
+      });
+    }).catch(function () { /* déjà absent */ });
+  }
+  function uniquePath(dirParts, name) {
+    var x = splitExt(seg(name, 80)), i = 1;
+    function next() {
+      var p = dirParts.concat([x.base + (i > 1 ? ' (' + i + ')' : '') + x.ext]).join('/');
+      return exists(p).then(function (yes) { if (yes) { i++; return next(); } return p; });
+    }
+    return next();
+  }
+  function moveFile(from, toDir) {
+    return readBlob(from).then(function (blob) {
+      return uniquePath(toDir, splitPath(from).name).then(function (to) {
+        return writeBlob(to, blob).then(function () { return removeFile(from); }).then(function () { return to; });
+      });
+    });
+  }
+
+  /* --- Fichier de données (dossier) : empreinte, conflits, sauvegardes --- */
+  var saveTimer = null, writeQueue = Promise.resolve(), dirty = false;
+  var fileStamp = null;       // { lm, size } du fichier tel que lu / écrit par cette session ; null = absent
+  var lastText = null;        // texte du fichier tel que lu / écrit par cette session
+  var backupDone = false, dailyDone = null, conflict = null, saveError = null, lastSaved = null;
+
+  function markDirty() {
+    db.modifie_le = nowIso();
+    dirty = true;
+    clearTimeout(saveTimer);
+    saveTimer = setTimeout(function () { saveTimer = null; save(); }, 400);
+    renderStorage();
+  }
+  function save() {
+    writeQueue = writeQueue.then(saveNow).then(function () { saveError = null; }, function (e) {
+      saveError = e.message || String(e); console.error(e);
+    }).then(renderStorage);
+    return writeQueue;
+  }
+  function flush() { if (saveTimer) { clearTimeout(saveTimer); saveTimer = null; return save(); } return writeQueue; }
+  function serialize() { return JSON.stringify(db, function (k, v) { return k.charAt(0) === '_' ? undefined : v; }, 1); }
+
+  function readDataFile() {
+    return store.dir.getFileHandle(DATA_FILE).then(function (fh) { return fh.getFile(); })
+      .then(function (f) { return f.text().then(function (t) { return { f: f, text: t }; }); }, function () { return null; });
+  }
+  /* Le fichier a-t-il été modifié hors de cette session (autre poste, synchro OneDrive/Teams…) ? */
+  function externalChange() {
+    return readDataFile().then(function (cur) {
+      if (!cur) { fileStamp = null; return null; }          // fichier supprimé ailleurs : il sera simplement réécrit
+      if (fileStamp && cur.f.lastModified === fileStamp.lm && cur.f.size === fileStamp.size) { return null; }
+      if (cur.text === lastText) { fileStamp = { lm: cur.f.lastModified, size: cur.f.size }; return null; }
+      return cur;
+    });
+  }
+  function saveNow() {
+    if (!dirty) { return; }
+    var text = serialize();
+    if (store.mode === 'browser') {
+      localStorage.setItem(CACHE_KEY, text);
+      dirty = false; lastSaved = new Date(); return;
+    }
+    if (store.mode !== 'folder' || conflict) { return; }
+    return externalChange().then(function (ext) {
+      if (ext) { raiseConflict(ext); return; }
+      var pre = Promise.resolve(), prev = lastText;
+      if (!backupDone && prev) { pre = writeBlob(BACKUP_FILE, new Blob([prev], { type: 'application/json' })); }
+      if (prev && dailyDone !== localDate()) { pre = pre.then(function () { return dailyBackup(prev); }).then(function () { dailyDone = localDate(); }); }
+      return pre.then(function () {
+        backupDone = true;
+        return writeBlob(DATA_FILE, new Blob([text], { type: 'application/json' }));
+      }).then(function () { return readDataFile(); }).then(function (cur) {
+        fileStamp = { lm: cur.f.lastModified, size: cur.f.size }; lastText = text;
+        dirty = serialize() !== text;   // une saisie a pu arriver pendant l'écriture
+        if (dirty) { markDirty(); }
+        lastSaved = new Date();
+      });
+    });
+  }
+  function dailyBackup(text) {
+    var name = 'inventaire-donnees-' + localDate() + '.json';
+    return exists(BACKUP_DIR + '/' + name).then(function (yes) {
+      if (yes) { return; }
+      return writeBlob(BACKUP_DIR + '/' + name, new Blob([text], { type: 'application/json' }));
+    }).then(function () {
+      return dirAt([BACKUP_DIR], false).then(function (d) {
+        var names = [], it = d.keys();
+        function step() {
+          return it.next().then(function (r) {
+            if (r.done) { return; }
+            if (/^inventaire-donnees-\d{4}-\d{2}-\d{2}\.json$/.test(r.value)) { names.push(r.value); }
+            return step();
+          });
+        }
+        return step().then(function () {
+          names.sort();
+          return Promise.all(names.slice(0, Math.max(0, names.length - DAILY_KEEP)).map(function (n) { return d.removeEntry(n); }));
+        });
+      });
+    });
+  }
+  function raiseConflict(ext) { conflict = ext; renderBanner(); renderStorage(); }
+  function resolveConflict(choice) {
+    var ext = conflict; if (!ext) { return; }
+    var ts = stampName();
+    if (choice === 'reload') {
+      writeBlob(BACKUP_DIR + '/inventaire-donnees-session-' + ts + '.json', new Blob([serialize()]))
+        .then(function () { return connect(store.dir); })
+        .then(function () { toast('Fichier rechargé. Votre version est copiée dans ' + BACKUP_DIR + '/', 'info'); },
+          function (e) { toast('Rechargement impossible : ' + e.message, 'ko'); });
+    } else if (choice === 'keep') {
+      var copy = ext.text != null ? writeBlob(BACKUP_DIR + '/inventaire-donnees-externe-' + ts + '.json', new Blob([ext.text])) : Promise.resolve();
+      copy.then(function () {
+        fileStamp = ext.f ? { lm: ext.f.lastModified, size: ext.f.size } : null;
+        lastText = ext.text; conflict = null; dirty = true; renderBanner(); return save();
+      }).then(function () { toast('Votre version est enregistrée. L’autre version est copiée dans ' + BACKUP_DIR + '/', 'info'); });
+    }
+  }
+  function checkExternal() {
+    if (store.mode !== 'folder' || conflict) { return; }
+    writeQueue = writeQueue.then(function () {
+      return externalChange().then(function (ext) {
+        if (!ext) { return; }
+        if (!dirty && ext.text) {             // rien en attente ici : on reprend simplement la version du fichier
+          var d; try { d = normalize(JSON.parse(ext.text)); } catch (e) { raiseConflict(ext); return; }
+          db = d; lastText = ext.text; fileStamp = { lm: ext.f.lastModified, size: ext.f.size };
+          render(true); toast('Données mises à jour depuis le fichier (modifié sur un autre poste)', 'info');
+        } else { raiseConflict(ext); }
+      });
+    }).catch(function (e) { console.error(e); });
+  }
+  document.addEventListener('visibilitychange', function () { if (!document.hidden) { checkExternal(); } });
+  window.addEventListener('focus', checkExternal);
+  window.addEventListener('beforeunload', function (e) {
+    if (dirty || saveTimer) { flush(); e.preventDefault(); e.returnValue = ''; }
+  });
+
+  /* --- Liaison du dossier --- */
+  function connect(h) {
+    store = { mode: 'folder', dir: h };
+    conflict = null; backupDone = false; dailyDone = null; saveError = null;
+    return idbPut('handles', HANDLE_KEY, h).catch(function () { /* mémorisation facultative */ }).then(readDataFile).then(function (cur) {
+      if (cur) {
+        var d;
+        try { d = normalize(JSON.parse(cur.text)); } catch (e) {
+          throw new Error(DATA_FILE + ' illisible (' + e.message + '). Corrigez ou retirez ce fichier, ou choisissez un autre dossier.');
+        }
+        db = d; lastText = cur.text; fileStamp = { lm: cur.f.lastModified, size: cur.f.size }; dirty = false;
+      } else {
+        fileStamp = null; lastText = null;
+        db = emptyDB(); dirty = true;
+        return save();
+      }
+    }).then(function () { render(); renderAll(); });
+  }
+  function linkFolder() {
+    return flush().then(function () { return window.showDirectoryPicker({ id: 'fsjd-inventaire', mode: 'readwrite' }); }).then(function (h) {
+      var prev = store.mode === 'browser' && Object.keys(db.etablissements).length ? db : null;
+      return readDataFileOf(h).then(function (has) {
+        if (prev && !has && window.confirm('Copier dans ce dossier l’inventaire saisi jusqu’ici dans le navigateur (données et fichiers) ?')) {
+          return copyBrowserToFolder(prev, h);
+        }
+        return connect(h);
+      });
+    }).catch(function (e) {
+      if (e && e.name === 'AbortError') { return; }
+      toast('Dossier non lié : ' + e.message, 'ko'); render();
+    });
+  }
+  function readDataFileOf(h) { return h.getFileHandle(DATA_FILE).then(function () { return true; }, function () { return false; }); }
+  function copyBrowserToFolder(prev, h) {
+    var atts = allAttachments(), blobs = [];
+    return atts.reduce(function (p, a) {
+      return p.then(function () { return readBlob(a.f.chemin).then(function (b) { blobs.push({ p: a.f.chemin, b: b }); }, function () { /* manquant */ }); });
+    }, Promise.resolve()).then(function () {
+      store = { mode: 'folder', dir: h };
+      return blobs.reduce(function (p, x) { return p.then(function () { return writeBlob(x.p, x.b); }); }, Promise.resolve());
+    }).then(function () {
+      fileStamp = null; lastText = null; backupDone = false; conflict = null;
+      db = prev; dirty = true;
+      return idbPut('handles', HANDLE_KEY, h).then(save);
+    }).then(function () { render(); renderAll(); toast('Inventaire copié dans le dossier « ' + h.name + ' »'); });
+  }
+  function reauthorize() {
+    var h = store.dir;
+    h.requestPermission({ mode: 'readwrite' }).then(function (p) {
+      if (p !== 'granted') { toast('Accès refusé au dossier « ' + h.name + ' »', 'ko'); return; }
+      return connect(h);
+    }).catch(function (e) { toast('Reconnexion impossible : ' + e.message, 'ko'); });
+  }
+  function unlinkFolder() {
+    if (store.mode !== 'folder') { return; }
+    if (!window.confirm('Délier le dossier « ' + store.dir.name + ' » ? Les données restent dans le dossier ; il faudra le choisir de nouveau pour continuer.')) { return; }
+    flush().then(function () {
+      return idbDel('handles', HANDLE_KEY).catch(function () { /* ignoré */ });
+    }).then(function () { store = { mode: 'none', dir: null }; db = emptyDB(); location.hash = '#/'; render(); renderAll(); });
+  }
+
+  /* ------------------------------------------------------------------ */
+  /* Pièces jointes                                                       */
+  /* ------------------------------------------------------------------ */
+  function attachTo(target, files) {
+    if (!canWrite()) { return Promise.resolve(); }
+    var list = [].slice.call(files || []);
+    var big = list.filter(function (f) { return f.size > MAX_FILE_MB * 1048576; });
+    if (big.length) { toast('Fichier trop volumineux (max ' + MAX_FILE_MB + ' Mo) : ' + big[0].name, 'ko'); }
+    list = list.filter(function (f) { return big.indexOf(f) < 0; });
+    if (!list.length) { return Promise.resolve(); }
+    var rec = target.rec(true), dir = target.dir();
+    toast('Enregistrement de ' + list.length + ' fichier' + (list.length > 1 ? 's' : '') + '…', 'info');
+    return list.reduce(function (p, file) {
+      return p.then(function () {
+        return uniquePath(dir, file.name).then(function (path) {
+          return writeBlob(path, file).then(function () {
+            rec.fichiers.push({ nom: splitPath(path).name, chemin: path, taille: file.size, ajoute_le: nowIso(), ajoute_par: who() });
+          });
+        });
+      });
+    }, Promise.resolve()).then(function () {
+      if (target.onAttach) { target.onAttach(rec); }
+      stamp(rec); markDirty(); target.refresh();
+      toast(list.length > 1 ? list.length + ' fichiers enregistrés' : 'Fichier enregistré');
+    }).catch(function (e) { toast('Échec de l’enregistrement du fichier : ' + e.message, 'ko'); target.refresh(); markDirty(); });
+  }
+  function detachFrom(target, i) {
+    var rec = target.rec(false); if (!rec || !rec.fichiers[i]) { return; }
+    var f = rec.fichiers[i];
+    var msg = store.mode === 'folder'
+      ? 'Retirer « ' + f.nom + ' » ? Le fichier est déplacé dans le dossier ' + TRASH_DIR + '/ (vous pourrez le supprimer vous-même).'
+      : 'Retirer et supprimer « ' + f.nom + ' » ?';
+    if (!window.confirm(msg)) { return; }
+    var op = store.mode === 'folder' ? moveFile(f.chemin, [TRASH_DIR, localDate()]) : removeFile(f.chemin);
+    op.catch(function () { /* fichier déjà absent : on retire seulement la ligne */ }).then(function () {
+      rec.fichiers.splice(i, 1); stamp(rec); markDirty(); target.refresh(); toast('Fichier retiré');
+    });
+  }
+  function openAttachment(path, name) {
+    var w = null;
+    var viewable = /\.(pdf|png|jpe?g|gif|webp|txt|svg)$/i.test(name);
+    if (viewable) { w = window.open('', '_blank'); }
+    readBlob(path).then(function (blob) {
+      var url = URL.createObjectURL(blob);
+      if (w) { w.location.href = url; } else { download(blob, name); }
+      setTimeout(function () { URL.revokeObjectURL(url); }, 120000);
+    }, function () {
+      if (w) { w.close(); }
+      toast('Fichier introuvable : ' + path + ' (déplacé ou supprimé hors de l’outil ?)', 'ko');
+    });
+  }
+  /* Après un renommage : range les fichiers dans le dossier qui correspond au nouveau nom */
+  function relocateFiles() {
+    if (!canWrite()) { return Promise.resolve(); }
+    var moves = allAttachments().filter(function (a) { return splitPath(a.f.chemin).dir.join('/') !== a.dir.join('/'); });
+    if (!moves.length) { return Promise.resolve(); }
+    toast('Rangement de ' + moves.length + ' fichier(s) dans les dossiers renommés…', 'info');
+    return moves.reduce(function (p, a) {
+      return p.then(function () { return moveFile(a.f.chemin, a.dir).then(function (to) { a.f.chemin = to; a.f.nom = splitPath(to).name; }, function () { /* manquant */ }); });
+    }, Promise.resolve()).then(function () { markDirty(); toast('Fichiers rangés'); });
+  }
+  function trashFilesOf(atts) {
+    if (!atts.length) { return Promise.resolve(); }
+    var dest = [TRASH_DIR, localDate()];
+    return atts.reduce(function (p, a) {
+      return p.then(function () {
+        if (store.mode === 'folder') { return moveFile(a.f.chemin, dest.concat(splitPath(a.f.chemin).dir.slice(1))).catch(function () { /* manquant */ }); }
+        return removeFile(a.f.chemin).catch(function () { /* manquant */ });
+      });
+    }, Promise.resolve());
+  }
+  function checkFiles() {
+    var atts = allAttachments(), missing = [];
+    return atts.reduce(function (p, a) {
+      return p.then(function () { return exists(a.f.chemin).then(function (y) { if (!y) { missing.push(a.f.chemin); } a.f._manquant = !y; }); });
+    }, Promise.resolve()).then(function () {
+      render(true);
+      if (!missing.length) { toast(atts.length + ' fichier(s) vérifié(s) : tous présents'); }
+      else { window.alert(missing.length + ' fichier(s) introuvable(s) (barrés dans les listes) :\n\n' + missing.slice(0, 30).join('\n') + (missing.length > 30 ? '\n…' : '')); }
+    });
+  }
+  function filesHtml(list) {
+    return '<div class="files">' + list.map(function (f, i) {
+      return '<span class="f' + (f._manquant ? ' missing' : '') + '"><a data-act="open" data-i="' + i + '" title="' + esc(f.chemin + ' — ' + sizeLabel(f.taille || 0) + ', ajouté le ' + frDateTime(f.ajoute_le) + (f.ajoute_par ? ' par ' + f.ajoute_par : '')) + '">📄 ' + esc(f.nom) + '</a>' +
+        '<button type="button" class="btn-link btn-danger" data-act="detach" data-i="' + i + '" title="Retirer ce fichier">✕</button></span>';
+    }).join('') + '<button type="button" class="btn btn-xs" data-act="attach" title="Ou glissez-déposez des fichiers sur la ligne">+ Joindre</button></div>';
+  }
+
+  /* ------------------------------------------------------------------ */
+  /* Vues                                                                  */
+  /* ------------------------------------------------------------------ */
+  var ctx = null;    // vue courante
+
+  function canWrite() { return store.mode === 'folder' ? !conflict : store.mode === 'browser'; }
+
+  function viewWelcome() {
+    var reauth = store.mode === 'reauth';
+    return '<div class="card welcome"><h1>Inventaire documentaire du patrimoine</h1>' +
+      '<p>Cet outil fonctionne <strong>sans connexion ni serveur</strong>. Toutes les saisies sont enregistrées dans un <strong>dossier de votre ordinateur</strong> (ou d’un dossier Teams / OneDrive synchronisé) :</p>' +
+      '<ul><li><code>' + DATA_FILE + '</code> : les informations, statuts, dates, commentaires et contrats ;</li>' +
+      '<li><code>' + FILES_DIR + '/</code> : les documents déposés, rangés par établissement, bâtiment, catégorie et document ;</li>' +
+      '<li><code>' + BACKUP_DIR + '/</code> : une sauvegarde automatique par jour (10 derniers jours).</li></ul>' +
+      '<p>Le menu ☰ permet d’<strong>exporter l’ensemble en dossier compressé (.zip)</strong> pour le transmettre.</p>' +
+      (reauth
+        ? '<p>Dernier dossier utilisé : <strong>' + esc(store.dir.name) + '</strong>. Le navigateur demande de confirmer l’accès.</p><div class="choices">' +
+          '<button class="btn btn-primary" data-act="reauth">Reprendre le dossier « ' + esc(store.dir.name) + ' »</button>' +
+          '<button class="btn" data-act="link-folder">Choisir un autre dossier…</button></div>'
+        : '<ol><li>Créez (ou choisissez) un dossier vide, par exemple <code>Inventaire_&lt;territoire&gt;</code>, et copiez-y ce fichier HTML ;</li>' +
+          '<li>cliquez ci-dessous et sélectionnez ce dossier, puis acceptez l’accès en modification ;</li>' +
+          '<li>pour reprendre un inventaire existant, choisissez le dossier qui contient <code>' + DATA_FILE + '</code>.</li></ol>' +
+          '<div class="choices"><button class="btn btn-primary" data-act="link-folder">Choisir le dossier de l’inventaire…</button></div>') +
+      '<p class="sub" style="margin-top:16px">Vous avez reçu un fichier .zip ? Choisissez d’abord un dossier vide, puis ☰ → « Importer un inventaire (.zip) ».</p></div>';
+  }
+
+  function viewHome() {
+    var etabs = vals(db.etablissements).sort(byName);
+    var html = '<div class="head"><h1>Établissements</h1><div class="head-actions">' +
+      '<button class="btn btn-primary" data-act="add-etab">+ Ajouter un établissement</button></div></div>';
+    if (!etabs.length) {
+      return html + '<div class="card empty"><h2 style="justify-content:center">Aucun établissement</h2><p>Commencez par ajouter les établissements dont vous êtes responsable, puis leurs bâtiments.</p></div>';
+    }
+    var alerts = contratAlerts();
+    if (alerts.length) { html += alertsCard(alerts, true); }
+    var groups = {};
+    etabs.forEach(function (e) { var g = e.territoire || 'Sans territoire'; (groups[g] = groups[g] || []).push(e); });
+    Object.keys(groups).sort(function (a, b) { return a.localeCompare(b, 'fr'); }).forEach(function (g) {
+      var t = { total: 0, traite: 0 }, cards = '';
+      groups[g].forEach(function (e) {
+        var st = etabStats(e.id), nb = batsOf(e.id).length, al = contratAlerts(e.id);
+        t.total += st.total; t.traite += st.traite;
+        var echus = al.filter(function (a) { return a.d < 0; }).length;
+        cards += '<a class="site" href="#/etab/' + e.id + '"><strong>' + esc(e.nom) + '</strong>' +
+          '<span class="sub">' + esc(e.adresse || '') + '</span>' +
+          '<span>' + bar(st.traite, st.total) + '</span>' +
+          '<span class="chips"><em>' + nb + ' bâtiment' + (nb > 1 ? 's' : '') + '</em>' +
+          (st.manquant ? '<em class="ko">' + st.manquant + ' manquant' + (st.manquant > 1 ? 's' : '') + '</em>' : '') +
+          (st.sansFichier ? '<em class="warn">' + st.sansFichier + ' fichier(s) à joindre</em>' : '') +
+          (echus ? '<em class="ko">' + echus + ' contrat(s) échu(s)</em>' : '') +
+          (al.length - echus ? '<em class="warn">' + (al.length - echus) + ' échéance(s) &lt; ' + ALERT_DAYS + ' j</em>' : '') + '</span></a>';
+      });
+      html += '<section class="card"><h2>' + esc(g) + '<small>' + bar(t.traite, t.total) + '</small></h2><div class="sites">' + cards + '</div></section>';
+    });
+    return html;
+  }
+  function alertsCard(alerts, withEtab) {
+    return '<section class="card"><h2>Échéances de contrats à surveiller<small class="sub">échus ou dans moins de ' + ALERT_DAYS + ' jours</small></h2><div class="rows"><table class="alerts"><tr>' +
+      (withEtab ? '<th>Établissement</th>' : '') + '<th>Bâtiment</th><th>Famille</th><th>Fournisseur / prestataire</th><th>Échéance</th><th></th></tr>' +
+      alerts.map(function (a) {
+        return '<tr>' + (withEtab ? '<td>' + esc(a.e ? a.e.nom : '') + '</td>' : '') + '<td><a href="#/bat/' + a.b.id + '">' + esc(a.b.nom) + '</a></td><td>' + esc(famille(a.c.famille).l) +
+          '</td><td>' + esc(a.c.fournisseur || '') + '</td><td>' + frDate(a.c.echeance) + '</td><td>' +
+          (a.d < 0 ? '<em class="ko">Échu</em>' : '<em class="warn">dans ' + a.d + ' j</em>') + '</td></tr>';
+      }).join('') + '</table></div></section>';
+  }
+
+  function fieldHtml(f, rec, scope) {
+    var v = rec[f.k], id = 'f_' + scope + '_' + f.k;
+    var a = ' id="' + id + '" data-scope="' + scope + '" data-k="' + f.k + '" data-t="' + f.t + '"';
+    var h = '<div class="field"><label for="' + id + '">' + esc(f.l) + (f.req ? ' *' : '') + '</label>';
+    if (f.t === 'choice') { h += '<select' + a + '>' + opts(f.o, v) + '</select>'; }
+    else if (f.t === 'area') { h += '<textarea' + a + ' rows="2">' + esc(v) + '</textarea>'; }
+    else {
+      h += '<input' + a + ' type="' + (f.t === 'text' ? 'text' : 'number') + '"' +
+        (f.t === 'num' ? ' step="any"' : '') + (f.t === 'int' ? ' step="1"' : '') + (f.t !== 'text' ? ' min="0"' : '') +
+        (f.list ? ' list="' + f.list + '"' : '') + ' value="' + esc(v) + '" placeholder="' + esc(f.h || '') + '">';
+    }
+    return h + '</div>';
+  }
+  function territoiresDatalist() {
+    var t = {}; vals(db.etablissements).forEach(function (e) { if (e.territoire) { t[e.territoire] = 1; } });
+    return '<datalist id="dl-territoires">' + Object.keys(t).sort().map(function (x) { return '<option value="' + esc(x) + '">'; }).join('') + '</datalist>';
+  }
+
+  function rowHtml(ownerId, m) {
+    var r = docRec(ownerId, m.k) || {}, files = r.fichiers || [];
+    var st = !r.statut ? 'todo' : (isDispo(r) && !files.length ? 'nofile' : statutClass(r.statut));
+    return '<div class="row s-' + statutClass(r.statut) + '" data-owner="' + ownerId + '" data-doc="' + esc(m.k) + '" data-st="' + st + '">' +
+      '<div class="lab">' + esc(m.libelle) +
+      (m.perso ? ' <button type="button" class="btn-link btn-danger" data-act="del-perso" title="Retirer ce document de la liste">✕</button>' : '') +
+      (r.modifie_par ? '<span class="by">Modifié par ' + esc(r.modifie_par) + ' le ' + frDateTime(r.modifie_le) + '</span>' : '') + '</div>' +
+      '<div><select aria-label="Statut" data-f="statut">' + opts(STATUTS.map(function (s) { return s.l; }), r.statut, 'À renseigner') + '</select></div>' +
+      '<div><input aria-label="Date du document" type="date" data-f="date_document" value="' + esc(r.date_document || '') + '"></div>' +
+      '<div><select aria-label="Priorité" data-f="priorite">' + opts(PRIORITES, r.priorite) + '</select></div>' +
+      '<div>' + filesHtml(files) + '</div>' +
+      '<div><input aria-label="Commentaire" type="text" data-f="commentaire" maxlength="500" value="' + esc(r.commentaire || '') + '" placeholder="Commentaire"></div></div>';
+  }
+  function checklistHtml(ownerId) {
+    var html = '<div class="toolbar"><label class="sub" for="flt">Afficher</label><select id="flt">' +
+      [['all', 'Tous les documents'], ['todo', 'À renseigner'], ['nofile', 'Disponibles sans fichier'], ['ko', 'Manquants']].map(function (o) {
+        return '<option value="' + o[0] + '"' + (ctx.filter === o[0] ? ' selected' : '') + '>' + o[1] + '</option>';
+      }).join('') + '</select><span class="sub">Glissez-déposez des fichiers directement sur la ligne d’un document.</span></div>';
+    var cat = null;
+    modelsFor(ownerId).forEach(function (m) {
+      if (m.cat !== cat) {
+        if (cat !== null) { html += '</div></details>'; }
+        cat = m.cat;
+        html += '<details class="group" open data-cat="' + esc(cat) + '"><summary><span>' + esc(cat) + '</span><span class="gp"></span></summary><div class="rows">' +
+          '<div class="row row-h"><div>Document</div><div>Statut</div><div>Date du document</div><div>Priorité</div><div>Fichiers</div><div>Commentaire</div></div>';
+      }
+      html += rowHtml(ownerId, m);
+    });
+    if (cat !== null) { html += '</div></details>'; }
+    return html + '<button type="button" class="btn btn-sm" data-act="add-perso" data-owner="' + ownerId + '">+ Ajouter un document hors liste</button>';
+  }
+  function updateProgress() {
+    if (!ctx || !ctx.owner) { return; }
+    var groups = {};
+    modelsFor(ctx.owner).forEach(function (m) {
+      var g = groups[m.cat] = groups[m.cat] || { t: 0, d: 0 }, r = docRec(ctx.owner, m.k);
+      g.t++; if (r && r.statut) { g.d++; }
+    });
+    [].forEach.call($app.querySelectorAll('.group[data-cat]'), function (el) {
+      var g = groups[el.getAttribute('data-cat')]; if (g) { el.querySelector('.gp').innerHTML = bar(g.d, g.t); }
+    });
+    var st = ctx.type === 'etab' ? etabStats(ctx.id) : stats(ctx.id), own = stats(ctx.owner);
+    var top = $app.querySelector('.topprog');
+    if (top) { top.innerHTML = bar(st.traite, st.total) + ' <span class="sub">' + st.traite + ' / ' + st.total + ' documents traités' + (ctx.type === 'etab' ? ' (site + bâtiments)' : '') + '</span>'; }
+    var dh = $app.querySelector('.docs-head small');
+    if (dh) { dh.innerHTML = bar(own.traite, own.total); }
+    applyFilter();
+  }
+  function applyFilter() {
+    var f = ctx && ctx.filter || 'all';
+    [].forEach.call($app.querySelectorAll('.row[data-st]'), function (el) {
+      el.classList.toggle('hidden', f !== 'all' && el.getAttribute('data-st') !== f);
+    });
+  }
+
+  function viewEtab(id) {
+    var e = db.etablissements[id];
+    if (!e) { return null; }
+    ctx = { type: 'etab', id: id, owner: id, filter: ctx && ctx.id === id ? ctx.filter : 'all' };
+    var bats = batsOf(id), alerts = contratAlerts(id);
+    return '<nav class="crumb"><a href="#/">Établissements</a> › <span>' + esc(e.nom) + '</span></nav>' +
+      '<div class="head"><h1>' + esc(e.nom) + '</h1><div class="head-actions"><div class="topprog"></div>' +
+      '<button class="btn btn-sm" data-act="export-zip-etab">Exporter cet établissement (.zip)</button>' +
+      '<button class="btn btn-sm btn-danger" data-act="del-etab">Supprimer</button></div></div>' +
+      '<section class="card"><h2>Informations générales du site</h2><div class="grid">' +
+      ETAB_FIELDS.map(function (f) { return fieldHtml(f, e, 'etab'); }).join('') + '</div>' + territoiresDatalist() + '</section>' +
+      '<section class="card"><h2>Bâtiments</h2><div class="bats">' +
+      bats.map(function (b) { var s = stats(b.id); return '<a class="bat" href="#/bat/' + b.id + '">' + esc(b.nom) + '<span>' + bar(s.traite, s.total) + '</span></a>'; }).join('') +
+      '<button type="button" class="btn btn-primary" data-act="add-bat">+ Ajouter un bâtiment</button></div></section>' +
+      (alerts.length ? alertsCard(alerts, false) : '') +
+      '<section class="card"><h2 class="docs-head">Documents du site<small></small></h2>' + checklistHtml(id) + '</section>';
+  }
+
+  function viewBat(id) {
+    var b = db.batiments[id], e = b && db.etablissements[b.etab_id];
+    if (!b || !e) { return null; }
+    ctx = { type: 'bat', id: id, owner: id, filter: ctx && ctx.id === id ? ctx.filter : 'all' };
+    return '<nav class="crumb"><a href="#/">Établissements</a> › <a href="#/etab/' + e.id + '">' + esc(e.nom) + '</a> › <span>' + esc(b.nom) + '</span></nav>' +
+      '<div class="head"><h1>' + esc(b.nom) + '</h1><div class="head-actions"><div class="topprog"></div>' +
+      '<button class="btn btn-sm btn-danger" data-act="del-bat">Supprimer ce bâtiment</button></div></div>' +
+      '<section class="card"><h2>Informations générales du bâtiment</h2><div class="grid">' +
+      BAT_FIELDS.map(function (f) { return fieldHtml(f, b, 'bat'); }).join('') + '</div></section>' +
+      '<section class="card"><h2 class="docs-head">Documents du bâtiment<small></small></h2>' + checklistHtml(id) + '</section>' + contratsHtml(id);
+  }
+
+  function contratsHtml(batId) {
+    var all = contratsOf(batId);
+    var html = '<section class="card"><h2>Contrats</h2><p class="sub">Pour chaque famille, renseignez les contrats en cours (un par bloc) et joignez le contrat signé.</p>';
+    ['Énergie', 'Maintenance'].forEach(function (type) {
+      html += '<h3>' + (type === 'Énergie' ? 'Fournitures d’énergie(s) / abonnements' : 'Contrats d’exploitation / maintenance') + '</h3>';
+      FAMILLES.filter(function (f) { return f.type === type; }).forEach(function (f) {
+        var rows = all.filter(function (c) { return c.famille === f.k; });
+        html += '<details class="group" ' + (rows.length ? 'open' : '') + '><summary><span>' + esc(f.l) +
+          '</span><span class="gp"><em>' + rows.length + ' contrat' + (rows.length > 1 ? 's' : '') + '</em></span></summary><div class="rows">' +
+          rows.map(contratHtml).join('') +
+          '<button type="button" class="btn btn-sm" data-act="add-contrat" data-fam="' + f.k + '">+ Ajouter un contrat</button></div></details>';
+      });
+    });
+    return html + '</section>';
+  }
+  function contratHtml(c) {
+    var type = famille(c.famille).type, alert = '';
+    if (c.echeance) {
+      var d = daysTo(c.echeance);
+      alert = d < 0 ? '<em class="ko">Échu</em>' : (d <= ALERT_DAYS ? '<em class="warn">Échéance dans ' + d + ' j</em>' : '');
+    }
+    return '<div class="contrat" data-contrat="' + c.id + '">' +
+      cf(c, 'nature', 'Nature du contrat', 'text') + cf(c, 'fournisseur', type === 'Énergie' ? 'Fournisseur' : 'Prestataire', 'text') +
+      cf(c, 'reference', type === 'Énergie' ? 'N° de contrat / PDL / PCE' : 'N° de contrat', 'text') +
+      cf(c, 'echeance', 'Échéance du contrat', 'date') + cf(c, 'reconduction', 'Reconduction / préavis', 'text') +
+      (type === 'Maintenance' ? cf(c, 'equipements', 'Nature des équipements', 'text') : '') +
+      cf(c, 'criticite', 'Criticité / remarque', 'text') +
+      '<div class="field"><label>Contrat (fichiers)</label>' + filesHtml(c.fichiers) + '</div>' +
+      '<div class="ctail">' + (c.modifie_par ? '<span class="by">Modifié par ' + esc(c.modifie_par) + ' le ' + frDateTime(c.modifie_le) + '</span>' : '<span></span>') + alert +
+      '<button type="button" class="btn-link btn-danger" data-act="del-contrat">Supprimer</button></div></div>';
+  }
+  function cf(c, k, l, t) {
+    return '<div class="field"><label>' + esc(l) + '</label><input type="' + t + '" data-cf="' + k + '" value="' + esc(c[k] || '') + '"></div>';
+  }
+
+  /* ------------------------------------------------------------------ */
+  /* Rendu et routage                                                    */
+  /* ------------------------------------------------------------------ */
+  function route() {
+    var m = (location.hash || '#/').match(/^#\/(etab|bat)\/([\w-]+)$/);
+    return m ? { type: m[1], id: m[2] } : { type: 'home' };
+  }
+  function render(keepScroll) {
+    var y = window.pageYOffset, html;
+    if (store.mode === 'none' || store.mode === 'reauth') { ctx = null; html = viewWelcome(); }
+    else {
+      var r = route();
+      html = r.type === 'etab' ? viewEtab(r.id) : r.type === 'bat' ? viewBat(r.id) : null;
+      if (html === null) {
+        if (r.type !== 'home') { location.replace('#/'); }
+        ctx = null; html = viewHome();
+      }
+    }
+    $app.innerHTML = html;
+    updateProgress();
+    window.scrollTo(0, keepScroll === true ? y : 0);
+  }
+  function renderStorage() {
+    var el = document.getElementById('storage'), cls, txt;
+    if (store.mode === 'folder') {
+      if (conflict) { cls = 'ko'; txt = 'Enregistrement suspendu (conflit)'; }
+      else if (saveError) { cls = 'ko'; txt = 'Échec d’enregistrement : ' + saveError; }
+      else if (dirty || saveTimer) { cls = 'pending'; txt = 'Enregistrement…'; }
+      else { cls = 'ok'; txt = 'Dossier « ' + store.dir.name + ' »' + (lastSaved ? ' — enregistré à ' + pad(lastSaved.getHours()) + ':' + pad(lastSaved.getMinutes()) : ''); }
+    } else if (store.mode === 'browser') {
+      cls = saveError ? 'ko' : 'pending'; txt = saveError ? 'Échec : ' + saveError : 'Données dans ce navigateur uniquement — exportez en .zip';
+    } else { cls = ''; txt = 'Aucun dossier lié'; }
+    el.innerHTML = '<span class="dot ' + cls + '"></span><span>' + esc(txt) + '</span>';
+    el.title = store.mode === 'folder' ? 'Données : ' + store.dir.name + '/' + DATA_FILE : '';
+    var on = store.mode === 'folder' || store.mode === 'browser';
+    document.getElementById('btn-zip').style.display = on ? '' : 'none';
+  }
+  function renderWho() {
+    document.getElementById('who').innerHTML = auteur ? 'Saisie : <strong>' + esc(auteur) + '</strong> <button type="button" class="btn-link" data-act="who">modifier</button>' : '';
+  }
+  function renderBanner() {
+    var b = document.getElementById('banner');
+    b.className = conflict ? 'ko' : '';
+    if (conflict) {
+      b.innerHTML = '<strong>Le fichier ' + DATA_FILE + ' a été modifié en dehors de cette page</strong> (autre poste, synchronisation Teams / OneDrive…). L’enregistrement est suspendu.' +
+        '<button class="btn btn-sm" data-act="conflict-reload">Recharger le fichier (ma version est copiée dans ' + BACKUP_DIR + '/)</button>' +
+        '<button class="btn btn-sm" data-act="conflict-keep">Garder ma version (l’autre est copiée dans ' + BACKUP_DIR + '/)</button>';
+    } else if (store.mode === 'browser') {
+      b.innerHTML = 'Ce navigateur ne sait pas écrire dans un dossier : l’inventaire est conservé <strong>dans le navigateur</strong>. Exportez-le régulièrement en .zip (Chrome ou Edge recommandés).';
+    } else { b.innerHTML = ''; }
+  }
+  function renderAll() { renderStorage(); renderWho(); renderBanner(); }
+  window.addEventListener('hashchange', function () { render(); });
+
+  /* ------------------------------------------------------------------ */
+  /* Cibles de pièces jointes (document ou contrat)                       */
+  /* ------------------------------------------------------------------ */
+  function targetFor(el) {
+    var row = el.closest('.row[data-doc]');
+    if (row) {
+      var owner = row.getAttribute('data-owner'), k = row.getAttribute('data-doc'), m = modelOf(owner, k);
+      return {
+        el: row,
+        rec: function (create) {
+          var key = docKey(owner, k);
+          if (!db.documents[key] && create) { db.documents[key] = { fichiers: [] }; }
+          return db.documents[key];
+        },
+        dir: function () { return docDir(owner, m); },
+        onAttach: function (rec) { if (!rec.statut) { rec.statut = 'Disponible'; } },
+        refresh: function () {
+          var cur = $app.querySelector('.row[data-owner="' + owner + '"][data-doc="' + k + '"]');
+          if (cur) { cur.outerHTML = rowHtml(owner, m); }
+          updateProgress();
+        }
+      };
+    }
+    var box = el.closest('.contrat[data-contrat]');
+    if (box) {
+      var c = db.contrats[box.getAttribute('data-contrat')];
+      return {
+        el: box, rec: function () { return c; }, dir: function () { return contratDir(c); },
+        refresh: function () {
+          var cur = $app.querySelector('.contrat[data-contrat="' + c.id + '"]');
+          if (cur) { cur.outerHTML = contratHtml(c); }
+        }
+      };
+    }
+    return null;
+  }
+
+  /* ------------------------------------------------------------------ */
+  /* Événements                                                            */
+  /* ------------------------------------------------------------------ */
+  function readValue(el, t) {
+    var v = el.value;
+    if (v === '') { return null; }
+    if (t === 'int') { return parseInt(v, 10); }
+    if (t === 'num') { return parseFloat(v); }
+    return v;
+  }
+  $app.addEventListener('change', function (e) {
+    var el = e.target;
+    if (el.id === 'flt') { ctx.filter = el.value; applyFilter(); return; }
+    if (el.type === 'file' || !canWrite()) { return; }
+    var scope = el.getAttribute('data-scope');
+    if (scope) {                                                     // informations générales
+      var rec = scope === 'etab' ? db.etablissements[ctx.id] : db.batiments[ctx.id];
+      var k = el.getAttribute('data-k'), v = readValue(el, el.getAttribute('data-t'));
+      if (typeof v === 'string') { v = v.trim(); }
+      if (k === 'nom' && !v) { toast('Le nom est obligatoire', 'ko'); el.value = rec.nom; return; }
+      rec[k] = v; stamp(rec); markDirty();
+      if (k === 'nom') { render(true); relocateFiles(); }
+      return;
+    }
+    var f = el.getAttribute('data-f');
+    if (f) {                                                         // ligne de document
+      var t = targetFor(el), r = t.rec(true);
+      r[f] = readValue(el, 'text'); stamp(r); markDirty();
+      var by = t.el.querySelector('.by');
+      if (f === 'statut' || !by) { t.refresh(); } else { by.textContent = 'Modifié par ' + r.modifie_par + ' le ' + frDateTime(r.modifie_le); }
+      if (f !== 'statut') { updateProgress(); }
+      return;
+    }
+    var k2 = el.getAttribute('data-cf');
+    if (k2) {                                                        // contrat
+      var tc = targetFor(el), c = tc.rec();
+      c[k2] = readValue(el, 'text'); stamp(c); markDirty();
+      if (k2 === 'echeance') { tc.refresh(); }
+    }
+  });
+
+  document.addEventListener('click', function (e) {
+    var b = e.target.closest('[data-act]');
+    if (!b) {
+      var menu = document.getElementById('menu');
+      if (menu.open && !e.target.closest('#menu')) { menu.open = false; }
+      return;
+    }
+    var act = b.getAttribute('data-act');
+    if (b.closest('.menu-items')) { document.getElementById('menu').open = false; }
+    var needsWrite = ['who', 'export-zip', 'export-csv', 'export-csv-contrats', 'export-zip-etab', 'check-files', 'open',
+      'link-folder', 'unlink-folder', 'reauth', 'conflict-reload', 'conflict-keep'].indexOf(act) < 0;
+    if (needsWrite && !canWrite()) {
+      toast(conflict ? 'Résolvez d’abord le conflit signalé en haut de la page' : 'Choisissez d’abord le dossier de l’inventaire', 'ko');
+      return;
+    }
+    var t;
+    switch (act) {
+      case 'link-folder': linkFolder(); break;
+      case 'unlink-folder': unlinkFolder(); break;
+      case 'reauth': reauthorize(); break;
+      case 'conflict-reload': resolveConflict('reload'); break;
+      case 'conflict-keep': resolveConflict('keep'); break;
+      case 'who':
+        var n = window.prompt('Votre nom :', auteur);
+        if (n && n.trim()) { auteur = n.trim(); try { localStorage.setItem(USER_KEY, auteur); } catch (x) { /* ignoré */ } renderWho(); }
+        break;
+      case 'export-zip': if (hasData()) { exportZip(null); } break;
+      case 'export-zip-etab': exportZip(ctx.id); break;
+      case 'export-csv': if (hasData()) { download(new Blob([csvDocuments(null)], { type: 'text/csv;charset=utf-8' }), 'synthese_documents_' + localDate() + '.csv'); } break;
+      case 'export-csv-contrats': if (hasData()) { download(new Blob([csvContrats(null)], { type: 'text/csv;charset=utf-8' }), 'synthese_contrats_' + localDate() + '.csv'); } break;
+      case 'import-zip': pickFiles('.zip', false, function (fs) { importZip(fs[0]); }); break;
+      case 'check-files': if (hasData()) { checkFiles(); } break;
+      case 'add-etab':
+        var nom = (window.prompt('Nom de l’établissement :') || '').trim();
+        if (!nom) { return; }
+        var last = vals(db.etablissements).sort(function (x, y) { return (y.cree_le || '') < (x.cree_le || '') ? -1 : 1; })[0];
+        var terr = (window.prompt('Territoire :', last && last.territoire || '') || '').trim();
+        var eid = uid('e');
+        db.etablissements[eid] = { id: eid, nom: nom, territoire: terr || null, cree_le: nowIso() }; stamp(db.etablissements[eid]);
+        markDirty(); location.hash = '#/etab/' + eid;
+        break;
+      case 'add-bat':
+        var bn = (window.prompt('Nom du nouveau bâtiment :') || '').trim();
+        if (!bn) { return; }
+        var bid = uid('b');
+        db.batiments[bid] = { id: bid, etab_id: ctx.id, nom: bn, cree_le: nowIso() }; stamp(db.batiments[bid]);
+        markDirty(); location.hash = '#/bat/' + bid;
+        break;
+      case 'del-etab': deleteEtab(ctx.id); break;
+      case 'del-bat': deleteBat(ctx.id); break;
+      case 'add-perso':
+        var lib = (window.prompt('Libellé du document à ajouter à la liste :') || '').trim();
+        if (!lib) { return; }
+        var pid = uid('p');
+        db.docs_perso[pid] = { id: pid, owner_id: b.getAttribute('data-owner'), libelle: lib, cree_le: nowIso() };
+        markDirty(); render(true);
+        break;
+      case 'del-perso':
+        var row = b.closest('.row'), owner = row.getAttribute('data-owner'), k = row.getAttribute('data-doc');
+        var r = docRec(owner, k);
+        if (!window.confirm('Retirer « ' + db.docs_perso[k].libelle + ' » de la liste' + (r && r.fichiers.length ? ' ? Ses fichiers seront déplacés dans ' + TRASH_DIR + '/.' : ' ?'))) { return; }
+        trashFilesOf(r ? r.fichiers.map(function (f) { return { f: f }; }) : []).then(function () {
+          delete db.docs_perso[k]; delete db.documents[docKey(owner, k)]; markDirty(); render(true);
+        });
+        break;
+      case 'add-contrat':
+        var cid = uid('c');
+        db.contrats[cid] = { id: cid, bat_id: ctx.id, famille: b.getAttribute('data-fam'), fichiers: [], cree_le: nowIso() };
+        stamp(db.contrats[cid]); markDirty(); render(true);
+        break;
+      case 'del-contrat':
+        t = targetFor(b); var c = t.rec();
+        if (!window.confirm('Supprimer ce contrat de l’inventaire' + (c.fichiers.length ? ' ? Ses fichiers seront déplacés dans ' + TRASH_DIR + '/.' : ' ?'))) { return; }
+        trashFilesOf(c.fichiers.map(function (f) { return { f: f }; })).then(function () { delete db.contrats[c.id]; markDirty(); render(true); });
+        break;
+      case 'attach':
+        t = targetFor(b);
+        pickFiles('', true, function (fs) { attachTo(t, fs); });
+        break;
+      case 'detach':
+        t = targetFor(b); detachFrom(t, +b.getAttribute('data-i'));
+        break;
+      case 'open':
+        t = targetFor(b); var f = t.rec(false).fichiers[+b.getAttribute('data-i')];
+        openAttachment(f.chemin, f.nom);
+        break;
+    }
+  });
+  function hasData() {
+    if (store.mode !== 'folder' && store.mode !== 'browser') { toast('Choisissez d’abord le dossier de l’inventaire', 'ko'); return false; }
+    return true;
+  }
+  function pickFiles(accept, multiple, cb) {
+    var inp = document.createElement('input');
+    inp.type = 'file'; inp.multiple = !!multiple; if (accept) { inp.accept = accept; }
+    inp.onchange = function () { if (inp.files.length) { cb(inp.files); } };
+    inp.click();
+  }
+
+  /* Glisser-déposer de fichiers sur une ligne de document ou un contrat */
+  var dropEl = null;
+  function setDrop(el) { if (dropEl && dropEl !== el) { dropEl.classList.remove('drop'); } dropEl = el; if (el) { el.classList.add('drop'); } }
+  $app.addEventListener('dragover', function (e) {
+    if (!e.dataTransfer || [].indexOf.call(e.dataTransfer.types || [], 'Files') < 0) { return; }
+    var el = e.target.closest('.row[data-doc], .contrat[data-contrat]');
+    if (!el) { setDrop(null); return; }
+    e.preventDefault(); e.dataTransfer.dropEffect = 'copy'; setDrop(el);
+  });
+  $app.addEventListener('dragleave', function (e) { if (!e.relatedTarget || !$app.contains(e.relatedTarget)) { setDrop(null); } });
+  $app.addEventListener('drop', function (e) {
+    var el = e.target.closest('.row[data-doc], .contrat[data-contrat]');
+    setDrop(null);
+    if (!el || !e.dataTransfer.files.length) { return; }
+    e.preventDefault();
+    attachTo(targetFor(el), e.dataTransfer.files);
+  });
+  window.addEventListener('dragover', function (e) { e.preventDefault(); });   // évite d'ouvrir le fichier à la place de la page
+  window.addEventListener('drop', function (e) { e.preventDefault(); });
+
+  function deleteEtab(id) {
+    var e = db.etablissements[id], bats = batsOf(id), atts = allAttachments(id);
+    if (!window.confirm('Supprimer l’établissement « ' + e.nom + ' », ses ' + bats.length + ' bâtiment(s) et toutes leurs saisies ?' +
+      (atts.length ? '\n\nSes ' + atts.length + ' fichier(s) seront déplacés dans ' + TRASH_DIR + '/.' : ''))) { return; }
+    trashFilesOf(atts).then(function () {
+      var owners = [id].concat(bats.map(function (b) { return b.id; }));
+      purgeOwners(owners);
+      bats.forEach(function (b) { delete db.batiments[b.id]; });
+      delete db.etablissements[id];
+      markDirty(); location.hash = '#/';
+    });
+  }
+  function deleteBat(id) {
+    var b = db.batiments[id];
+    var atts = allAttachments(b.etab_id).filter(function (a) { return a.dir.join('/').indexOf(ownerDir(id).join('/') + '/') === 0; });
+    if (!window.confirm('Supprimer le bâtiment « ' + b.nom + ' », ses documents et ses contrats ?' +
+      (atts.length ? '\n\nSes ' + atts.length + ' fichier(s) seront déplacés dans ' + TRASH_DIR + '/.' : ''))) { return; }
+    trashFilesOf(atts).then(function () {
+      purgeOwners([id]); delete db.batiments[id];
+      markDirty(); location.hash = '#/etab/' + b.etab_id;
+    });
+  }
+  function purgeOwners(owners) {
+    Object.keys(db.documents).forEach(function (k) { if (owners.indexOf(k.split('|')[0]) >= 0) { delete db.documents[k]; } });
+    vals(db.docs_perso).forEach(function (p) { if (owners.indexOf(p.owner_id) >= 0) { delete db.docs_perso[p.id]; } });
+    vals(db.contrats).forEach(function (c) { if (owners.indexOf(c.bat_id) >= 0) { delete db.contrats[c.id]; } });
+  }
+
+  /* ------------------------------------------------------------------ */
+  /* Synthèses CSV                                                         */
+  /* ------------------------------------------------------------------ */
+  function csv(rows) {
+    return '﻿' + rows.map(function (row) {
+      return row.map(function (c) { return '"' + String(c == null ? '' : c).replace(/"/g, '""') + '"'; }).join(';');
+    }).join('\r\n');
+  }
+  function etabsFor(filterEtab) { return vals(db.etablissements).filter(function (e) { return !filterEtab || e.id === filterEtab; }).sort(byName); }
+  function csvDocuments(filterEtab) {
+    var rows = [['Territoire', 'Établissement', 'Bâtiment', 'Catégorie', 'Document', 'Statut', 'Date du document', 'Priorité', 'Nb fichiers', 'Fichiers', 'Commentaire', 'Modifié par', 'Modifié le']];
+    etabsFor(filterEtab).forEach(function (e) {
+      [{ id: e.id, nom: '(site)' }].concat(batsOf(e.id)).forEach(function (o) {
+        modelsFor(o.id).forEach(function (m) {
+          var r = docRec(o.id, m.k) || { fichiers: [] };
+          rows.push([e.territoire, e.nom, o.nom, m.cat, m.libelle, r.statut || 'À renseigner', frDate(r.date_document), r.priorite,
+            r.fichiers.length, r.fichiers.map(function (f) { return f.chemin; }).join(' | '), r.commentaire, r.modifie_par, frDateTime(r.modifie_le)]);
+        });
+      });
+    });
+    return csv(rows);
+  }
+  function csvContrats(filterEtab) {
+    var rows = [['Territoire', 'Établissement', 'Bâtiment', 'Type', 'Famille', 'Nature', 'Fournisseur / prestataire', 'N° de contrat', 'Échéance', 'Reconduction / préavis', 'Équipements', 'Criticité / remarque', 'Fichiers', 'Modifié par', 'Modifié le']];
+    etabsFor(filterEtab).forEach(function (e) {
+      batsOf(e.id).forEach(function (b) {
+        contratsOf(b.id).forEach(function (c) {
+          var f = famille(c.famille);
+          rows.push([e.territoire, e.nom, b.nom, f.type, f.l, c.nature, c.fournisseur, c.reference, frDate(c.echeance), c.reconduction, c.equipements, c.criticite,
+            c.fichiers.map(function (x) { return x.chemin; }).join(' | '), c.modifie_par, frDateTime(c.modifie_le)]);
+        });
+      });
+    });
+    return csv(rows);
+  }
+
+  /* ------------------------------------------------------------------ */
+  /* Archive .zip (écriture et lecture, sans bibliothèque)                 */
+  /* ------------------------------------------------------------------ */
+  var CRC_TABLE = (function () {
+    var t = new Uint32Array(256);
+    for (var n = 0; n < 256; n++) { var c = n; for (var k = 0; k < 8; k++) { c = c & 1 ? 0xEDB88320 ^ (c >>> 1) : c >>> 1; } t[n] = c >>> 0; }
+    return t;
+  })();
+  function crc32(u8) {
+    var c = 0xFFFFFFFF;
+    for (var i = 0; i < u8.length; i++) { c = CRC_TABLE[(c ^ u8[i]) & 0xFF] ^ (c >>> 8); }
+    return (c ^ 0xFFFFFFFF) >>> 0;
+  }
+  function pipe(u8, stream) { return new Response(new Blob([u8]).stream().pipeThrough(stream)).arrayBuffer().then(function (b) { return new Uint8Array(b); }); }
+  var DEFLATE_OK = typeof window.CompressionStream === 'function';
+  var ALREADY_COMPRESSED = /\.(pdf|zip|7z|rar|gz|jpe?g|png|gif|webp|heic|mp4|mov|docx|xlsx|pptx|odt|ods|msg)$/i;
+
+  /* entries : [{ name, data: Blob | string, date }] → Blob .zip (UTF-8, stocké ou deflate) */
+  function buildZip(entries, onProgress) {
+    var enc = new TextEncoder(), parts = [], central = [], offset = 0, i = 0;
+    function one(e) {
+      var src = typeof e.data === 'string' ? new Blob([e.data]) : e.data;
+      return src.arrayBuffer().then(function (ab) {
+        var raw = new Uint8Array(ab), crc = crc32(raw);
+        var tryDeflate = DEFLATE_OK && raw.length > 256 && !ALREADY_COMPRESSED.test(e.name);
+        return (tryDeflate ? pipe(raw, new CompressionStream('deflate-raw')).catch(function () { return null; }) : Promise.resolve(null)).then(function (def) {
+          var method = def && def.length < raw.length ? 8 : 0, body = method ? def : src, csize = method ? def.length : raw.length;
+          var name = enc.encode(e.name), d = e.date || new Date();
+          var time = (d.getHours() << 11) | (d.getMinutes() << 5) | (d.getSeconds() >> 1);
+          var date = ((Math.max(1980, d.getFullYear()) - 1980) << 9) | ((d.getMonth() + 1) << 5) | d.getDate();
+          var lh = new DataView(new ArrayBuffer(30));
+          lh.setUint32(0, 0x04034b50, true); lh.setUint16(4, 20, true); lh.setUint16(6, 0x0800, true); lh.setUint16(8, method, true);
+          lh.setUint16(10, time, true); lh.setUint16(12, date, true); lh.setUint32(14, crc, true);
+          lh.setUint32(18, csize, true); lh.setUint32(22, raw.length, true); lh.setUint16(26, name.length, true); lh.setUint16(28, 0, true);
+          var ch = new DataView(new ArrayBuffer(46));
+          ch.setUint32(0, 0x02014b50, true); ch.setUint16(4, 20, true); ch.setUint16(6, 20, true); ch.setUint16(8, 0x0800, true); ch.setUint16(10, method, true);
+          ch.setUint16(12, time, true); ch.setUint16(14, date, true); ch.setUint32(16, crc, true); ch.setUint32(20, csize, true); ch.setUint32(24, raw.length, true);
+          ch.setUint16(28, name.length, true); ch.setUint32(42, offset, true);
+          parts.push(lh.buffer, name, body); central.push(ch.buffer, name);
+          offset += 30 + name.length + csize;
+          if (offset > 0xFFFFFFFF) { throw new Error('archive de plus de 4 Go : exportez établissement par établissement'); }
+        });
+      });
+    }
+    return entries.reduce(function (p, e) {
+      return p.then(function () { return one(e); }).then(function () { i++; if (onProgress) { onProgress(i, entries.length); } });
+    }, Promise.resolve()).then(function () {
+      var cdSize = central.reduce(function (s, x) { return s + x.byteLength; }, 0);
+      var end = new DataView(new ArrayBuffer(22));
+      end.setUint32(0, 0x06054b50, true); end.setUint16(8, entries.length, true); end.setUint16(10, entries.length, true);
+      end.setUint32(12, cdSize, true); end.setUint32(16, offset, true);
+      return new Blob(parts.concat(central, [end.buffer]), { type: 'application/zip' });
+    });
+  }
+  function readZip(file) {
+    return file.arrayBuffer().then(function (ab) {
+      var u8 = new Uint8Array(ab), dv = new DataView(ab), i, dec = new TextDecoder();
+      for (i = u8.length - 22; i >= Math.max(0, u8.length - 65557); i--) { if (dv.getUint32(i, true) === 0x06054b50) { break; } }
+      if (i < Math.max(0, u8.length - 65557)) { throw new Error('ce fichier n’est pas une archive .zip valide'); }
+      var n = dv.getUint16(i + 10, true), p = dv.getUint32(i + 16, true), out = [];
+      for (var k = 0; k < n; k++) {
+        if (dv.getUint32(p, true) !== 0x02014b50) { throw new Error('archive .zip endommagée'); }
+        var method = dv.getUint16(p + 10, true), csize = dv.getUint32(p + 20, true);
+        var nl = dv.getUint16(p + 28, true), xl = dv.getUint16(p + 30, true), cl = dv.getUint16(p + 32, true), lho = dv.getUint32(p + 42, true);
+        var name = dec.decode(u8.subarray(p + 46, p + 46 + nl)).replace(/\\/g, '/');
+        p += 46 + nl + xl + cl;
+        if (/\/$/.test(name)) { continue; }
+        out.push({ name: name, method: method, csize: csize, lho: lho });
+      }
+      out.forEach(function (e) {
+        e.blob = function () {
+          var s = e.lho + 30 + dv.getUint16(e.lho + 26, true) + dv.getUint16(e.lho + 28, true), raw = u8.subarray(s, s + e.csize);
+          if (e.method === 0) { return Promise.resolve(new Blob([raw])); }
+          if (e.method === 8 && typeof window.DecompressionStream === 'function') { return pipe(raw, new DecompressionStream('deflate-raw')).then(function (x) { return new Blob([x]); }); }
+          return Promise.reject(new Error('méthode de compression non prise en charge (' + e.method + ') pour ' + e.name));
+        };
+      });
+      return out;
+    });
+  }
+
+  function exportZip(filterEtab) {
+    flush().then(function () {
+      var sub = filterEtab ? subsetFor(filterEtab) : db;
+      var rootName = 'Inventaire_' + seg(filterEtab ? db.etablissements[filterEtab].nom : 'patrimoine', 40).replace(/ /g, '_') + '_' + localDate();
+      var entries = [
+        { name: rootName + '/' + DATA_FILE, data: filterEtab ? JSON.stringify(sub, null, 1) : serialize() },
+        { name: rootName + '/synthese_documents.csv', data: csvDocuments(filterEtab) },
+        { name: rootName + '/synthese_contrats.csv', data: csvContrats(filterEtab) },
+        { name: rootName + '/Inventaire_Patrimoine.html', data: SELF_HTML },
+        { name: rootName + '/LISEZMOI.txt', data: readme() }
+      ];
+      var atts = allAttachments(filterEtab), missing = [];
+      return atts.reduce(function (p, a) {
+        return p.then(function () {
+          return readBlob(a.f.chemin).then(function (b) { entries.push({ name: rootName + '/' + a.f.chemin, data: b, date: b.lastModified ? new Date(b.lastModified) : null }); },
+            function () { missing.push(a.f.chemin); });
+        });
+      }, Promise.resolve()).then(function () {
+        return buildZip(entries, function (i, n) { if (n > 10) { toast('Compression… ' + i + ' / ' + n, 'info'); } });
+      }).then(function (zip) {
+        download(zip, rootName + '.zip');
+        toast('Archive créée (' + sizeLabel(zip.size) + ')' + (missing.length ? ' — ' + missing.length + ' fichier(s) introuvable(s) non inclus' : ''), missing.length ? 'ko' : 'ok');
+      });
+    }).catch(function (e) { toast('Export impossible : ' + e.message, 'ko'); });
+  }
+  function subsetFor(etabId) {
+    var s = emptyDB(); s.cree_le = db.cree_le; s.modifie_le = db.modifie_le;
+    s.etablissements[etabId] = db.etablissements[etabId];
+    var owners = [etabId];
+    batsOf(etabId).forEach(function (b) { s.batiments[b.id] = b; owners.push(b.id); });
+    Object.keys(db.documents).forEach(function (k) { if (owners.indexOf(k.split('|')[0]) >= 0) { s.documents[k] = db.documents[k]; } });
+    vals(db.docs_perso).forEach(function (p) { if (owners.indexOf(p.owner_id) >= 0) { s.docs_perso[p.id] = p; } });
+    vals(db.contrats).forEach(function (c) { if (owners.indexOf(c.bat_id) >= 0) { s.contrats[c.id] = c; } });
+    return s;
+  }
+  function readme() {
+    return 'Inventaire documentaire du patrimoine - FSJD\r\nExporté le ' + frDateTime(nowIso()) + ' par ' + (auteur || '?') + '\r\n\r\n' +
+      'Contenu :\r\n' +
+      '  ' + DATA_FILE + '         toutes les saisies (format JSON)\r\n' +
+      '  synthese_documents.csv           tableau des documents (Excel : séparateur ;)\r\n' +
+      '  synthese_contrats.csv            tableau des contrats\r\n' +
+      '  ' + FILES_DIR + '/                         documents déposés : Établissement / _Site ou Bâtiment / Catégorie / Document\r\n' +
+      '  Inventaire_Patrimoine.html       l\'outil de saisie\r\n\r\n' +
+      'Pour reprendre la saisie : extraire l\'archive, ouvrir Inventaire_Patrimoine.html avec Chrome ou Edge,\r\n' +
+      'puis choisir le dossier extrait (celui qui contient ' + DATA_FILE + ').\r\n';
+  }
+
+  function importZip(file) {
+    flush().then(function () { return readZip(file); }).then(function (entries) {
+      var data = entries.filter(function (e) { return e.name === DATA_FILE || /\/inventaire-donnees\.json$/.test(e.name); })
+        .sort(function (a, b) { return a.name.length - b.name.length; })[0];
+      if (!data) { throw new Error('aucun fichier ' + DATA_FILE + ' dans l’archive'); }
+      var prefix = data.name.slice(0, data.name.length - DATA_FILE.length);
+      return data.blob().then(function (b) { return b.text(); }).then(function (text) {
+        var incoming = normalize(JSON.parse(text));
+        var nE = Object.keys(incoming.etablissements).length;
+        var hasCurrent = Object.keys(db.etablissements).length > 0;
+        var mode = 'replace';
+        if (hasCurrent) {
+          var ans = window.prompt('L’archive contient ' + nE + ' établissement(s).\n\n' +
+            'Tapez 1 pour AJOUTER ces établissements à l’inventaire actuel (ceux qui existent déjà sont remplacés par la version de l’archive),\n' +
+            'ou 2 pour REMPLACER tout l’inventaire actuel (une copie est gardée dans ' + BACKUP_DIR + '/).', '1');
+          if (ans === null) { return; }
+          mode = ans.trim() === '2' ? 'replace' : 'merge';
+        }
+        var files = entries.filter(function (e) { return e.name.indexOf(prefix + FILES_DIR + '/') === 0; });
+        toast('Import de ' + files.length + ' fichier(s)…', 'info');
+        var pre = hasCurrent && store.mode === 'folder'
+          ? writeBlob(BACKUP_DIR + '/inventaire-donnees-avant-import-' + stampName() + '.json', new Blob([serialize()])) : Promise.resolve();
+        return pre.then(function () {
+          return files.reduce(function (p, e, i) {
+            return p.then(function () { return e.blob(); }).then(function (b) {
+              if (files.length > 10 && i % 5 === 0) { toast('Import… ' + (i + 1) + ' / ' + files.length, 'info'); }
+              return writeBlob(e.name.slice(prefix.length), b);
+            });
+          }, Promise.resolve());
+        }).then(function () {
+          if (mode === 'replace') { db = incoming; }
+          else {
+            Object.keys(incoming.etablissements).forEach(function (id) {
+              if (db.etablissements[id]) { var old = [id].concat(batsOf(id).map(function (b) { return b.id; })); purgeOwners(old); old.slice(1).forEach(function (b) { delete db.batiments[b]; }); }
+            });
+            ['etablissements', 'batiments', 'documents', 'docs_perso', 'contrats'].forEach(function (k) { Object.assign(db[k], incoming[k]); });
+          }
+          markDirty(); location.hash = '#/'; render();
+          toast('Import terminé : ' + nE + ' établissement(s), ' + files.length + ' fichier(s)');
+          return relocateFiles();
+        });
+      });
+    }).catch(function (e) { toast('Import impossible : ' + e.message, 'ko'); });
+  }
+
+  /* ------------------------------------------------------------------ */
+  /* Démarrage                                                            */
+  /* ------------------------------------------------------------------ */
+  function boot() {
+    renderAll();
+    if (!FS_OK) {
+      store = { mode: 'browser', dir: null };
+      try { var t = localStorage.getItem(CACHE_KEY); if (t) { db = normalize(JSON.parse(t)); } } catch (e) { toast('Données du navigateur illisibles : ' + e.message, 'ko'); }
+      renderAll(); render(); return;
+    }
+    idbGet('handles', HANDLE_KEY).then(function (h) {
+      if (!h) { store = { mode: 'none', dir: null }; return; }
+      return h.queryPermission({ mode: 'readwrite' }).then(function (p) {
+        if (p === 'granted') { return connect(h); }
+        store = { mode: 'reauth', dir: h };
+      });
+    }).catch(function (e) {
+      console.error(e); store = { mode: 'none', dir: null };
+      toast(e.message, 'ko');
+    }).then(function () { renderAll(); if (store.mode !== 'folder') { render(); } });
+  }
+  window.FSJD_TEST = { get db() { return db; }, flush: flush, buildZip: buildZip, readZip: readZip, connect: connect, store: function () { return store; } };
+  boot();
+})();
+</script>
+</body>
+</html>
